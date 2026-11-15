@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# 데이터: 원본과 변환 결과는 저장소에 넣지 않는다 (심볼릭 링크로만 연결)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# 에디터, 에이전트 로컬 설정
+.vscode/
+.claude/
