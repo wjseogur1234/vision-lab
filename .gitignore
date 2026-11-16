@@ -12,6 +12,9 @@ data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
+# 로컬 환경 변수 (데이터 경로)
+.env
+
 # 에디터, 에이전트 로컬 설정
 .vscode/
 .claude/

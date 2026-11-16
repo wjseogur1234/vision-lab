@@ -15,6 +15,8 @@
 ```text
 .
 ├── pyproject.toml        # 의존성. LibreYOLO(PyPI)와 torch CUDA 빌드를 지정한다
+├── Dockerfile            # 실행 환경 이미지
+├── compose.yaml          # 컨테이너 실행 설정 (GPU, 소스·데이터 마운트)
 ├── configs/
 │   └── data/             # 데이터셋 YAML (LibreYOLO에 넘기는 파일)
 ├── src/
@@ -35,6 +37,18 @@ uv sync
 ```
 
 torch는 CUDA 12.8 빌드(`cu128`)를 받는다. 다른 GPU 환경에서는 `pyproject.toml`의 인덱스를 바꾼다.
+
+### Docker
+
+GPU를 쓰려면 호스트에 NVIDIA 드라이버와 NVIDIA Container Toolkit이 있어야 한다.
+
+```bash
+cp .env.example .env          # RAW_DATA_DIR에 원본 데이터 경로를 적는다
+docker compose build
+docker compose run --rm lab   # 컨테이너 안의 셸을 연다
+```
+
+소스는 `/app`에 마운트한다. 원본 데이터는 호스트와 같은 경로에 읽기 전용으로 마운트한다.
 
 ## 데이터
 
