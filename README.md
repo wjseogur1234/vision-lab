@@ -15,8 +15,8 @@
 ```text
 .
 ├── pyproject.toml        # 의존성. LibreYOLO(PyPI)와 torch CUDA 빌드를 지정한다
-├── Dockerfile            # 실행 환경 이미지
-├── compose.yaml          # 컨테이너 실행 설정 (GPU, 소스·데이터 마운트)
+├── Dockerfile            # 실행 환경 이미지 (전처리, 학습)
+├── compose.yaml          # 컨테이너 실행 설정 (환경별 마운트, GPU)
 ├── configs/
 │   └── data/             # 데이터셋 YAML (LibreYOLO에 넘기는 파일)
 ├── src/
@@ -32,23 +32,40 @@ LibreYOLO는 고치지 않고 라이브러리로만 쓴다. 이 저장소에는 
 
 [uv](https://docs.astral.sh/uv/)를 쓴다.
 
+환경은 2개다. 의존성 그룹으로 나눈다.
+
+| 환경 | 하는 일 | 의존성 그룹 | GPU |
+|---|---|---|---|
+| 전처리 | 원본을 거르고 YOLO 형식으로 변환한다 | `prep` | 안 씀 |
+| 학습 | LibreYOLO로 학습하고 추론한다 | `train` | 씀 |
+
 ```bash
-uv sync
+uv sync --group prep     # 전처리 환경
+uv sync --group train    # 학습 환경
 ```
 
 torch는 CUDA 12.8 빌드(`cu128`)를 받는다. 다른 GPU 환경에서는 `pyproject.toml`의 인덱스를 바꾼다.
 
 ### Docker
 
-GPU를 쓰려면 호스트에 NVIDIA 드라이버와 NVIDIA Container Toolkit이 있어야 한다.
+환경마다 서비스가 하나씩 있다.
+학습 환경에서 GPU를 쓰려면 호스트에 NVIDIA 드라이버와 NVIDIA Container Toolkit이 있어야 한다.
 
 ```bash
-cp .env.example .env          # RAW_DATA_DIR에 원본 데이터 경로를 적는다
+cp .env.example .env            # RAW_DATA_DIR에 원본 데이터 경로를 적는다
 docker compose build
-docker compose run --rm lab   # 컨테이너 안의 셸을 연다
+docker compose run --rm prep    # 전처리 환경의 셸을 연다
+docker compose run --rm train   # 학습 환경의 셸을 연다
 ```
 
-소스는 `/app`에 마운트한다. 원본 데이터는 호스트와 같은 경로에 읽기 전용으로 마운트한다.
+| 마운트 | 전처리 (`prep`) | 학습 (`train`) |
+|---|---|---|
+| 소스 (`/app`) | 쓰기 가능 | 쓰기 가능 |
+| 원본 데이터 | 읽기 전용 | 마운트 안 함 |
+| `data/processed/` | 쓰기 가능 | 읽기 전용 |
+
+원본 데이터는 호스트와 같은 경로에 마운트한다.
+학습 환경은 전처리 결과만 읽는다.
 
 ## 데이터
 

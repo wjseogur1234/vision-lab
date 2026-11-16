@@ -4,14 +4,21 @@ version = "0.0.0"
 description = "LibreYOLO 기반 vision AI 학습 프로젝트 (CCTV 보행자 검출)"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = [
+dependencies = []
+
+# 환경마다 그룹을 골라 설치한다.
+#   전처리 환경: uv sync --group prep
+#   학습 환경:   uv sync --group train
+[dependency-groups]
+# 전처리 환경. 원본을 거르고 YOLO 형식으로 변환한다. Phase 0에서 채운다.
+prep = []
+# 학습 환경. LibreYOLO로 학습하고 추론한다.
+train = [
     "libreyolo>=1.7.4",
     # LibreYOLO의 의존성이지만, 아래 CUDA 인덱스를 적용하려고 직접 적는다.
     "torch>=2.4.0",
     "torchvision>=0.19.0",
 ]
-
-[dependency-groups]
 dev = [
     "pytest>=8.3",
     "ruff>=0.14.10",

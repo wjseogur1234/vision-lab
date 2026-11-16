@@ -1,7 +1,10 @@
 services:
-  lab:
-    build: .
-    image: vision-lab
+  # 전처리 환경: 원본을 거르고 data/processed/ 에 결과를 쓴다. GPU를 쓰지 않는다.
+  prep:
+    build:
+      context: .
+      target: prep
+    image: vision-lab-prep
     working_dir: /app
     volumes:
       # 소스를 마운트한다. 호스트에서 고친 코드가 바로 반영된다.
@@ -9,6 +12,20 @@ services:
       # 원본 데이터를 호스트와 같은 경로에 읽기 전용으로 마운트한다.
       # data/raw/ 의 심볼릭 링크가 컨테이너 안에서도 같은 경로를 가리킨다.
       - ${RAW_DATA_DIR:?.env 파일에 RAW_DATA_DIR을 적는다}:${RAW_DATA_DIR}:ro
+    stdin_open: true
+    tty: true
+
+  # 학습 환경: data/processed/ 를 읽어 학습한다. 원본 데이터는 마운트하지 않는다.
+  train:
+    build:
+      context: .
+      target: train
+    image: vision-lab-train
+    working_dir: /app
+    volumes:
+      - .:/app
+      # 전처리 결과는 읽기 전용으로 덮어 마운트한다.
+      - ./data/processed:/app/data/processed:ro
     # DataLoader 워커가 쓰는 공유 메모리
     shm_size: "8gb"
     stdin_open: true
