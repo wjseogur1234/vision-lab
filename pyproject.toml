@@ -10,8 +10,16 @@ dependencies = []
 #   전처리 환경: uv sync --group prep
 #   학습 환경:   uv sync --group train
 [dependency-groups]
-# 전처리 환경. 원본을 거르고 YOLO 형식으로 변환한다. Phase 0에서 채운다.
-prep = []
+# 전처리 환경. 원본을 거르고 YOLO 형식으로 변환한다.
+# 압축 풀기(zipfile)와 라벨 읽기(json)는 표준 라이브러리로 한다.
+prep = [
+    # 이미지 크기 읽기, 깨진 이미지 검사. 라벨 JSON에 이미지 크기가 없다.
+    "pillow>=11.0",
+    # 데이터셋 YAML 쓰기
+    "pyyaml>=6.0",
+    # 진행 상황 표시
+    "tqdm>=4.66",
+]
 # 학습 환경. LibreYOLO로 학습하고 추론한다.
 train = [
     "libreyolo>=1.7.4",
