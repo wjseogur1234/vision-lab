@@ -6,27 +6,21 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 
-# 환경마다 그룹을 골라 설치한다.
-#   전처리 환경: uv sync --group prep
-#   학습 환경:   uv sync --group train
 [dependency-groups]
-# 전처리 환경. 원본을 거르고 YOLO 형식으로 변환한다.
-# 압축 풀기(zipfile)와 라벨 읽기(json)는 표준 라이브러리로 한다.
+# ---------- 전처리 환경 ----------
 prep = [
-    # 이미지 크기 읽기, 깨진 이미지 검사. 라벨 JSON에 이미지 크기가 없다.
     "pillow>=11.0",
-    # 데이터셋 YAML 쓰기
     "pyyaml>=6.0",
-    # 진행 상황 표시
     "tqdm>=4.66",
 ]
-# 학습 환경. LibreYOLO로 학습하고 추론한다.
+# ---------- 학습 환경 ----------
 train = [
     "libreyolo>=1.7.4",
     # LibreYOLO의 의존성이지만, 아래 CUDA 인덱스를 적용하려고 직접 적는다.
     "torch>=2.4.0",
     "torchvision>=0.19.0",
 ]
+# ---------- 개발 도구 (공통) ----------
 dev = [
     "pytest>=8.3",
     "ruff>=0.14.10",

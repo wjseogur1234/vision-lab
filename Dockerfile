@@ -1,7 +1,4 @@
-# 타깃이 2개다.
-#   prep:  전처리 환경. torch를 설치하지 않는다.
-#   train: 학습 환경. LibreYOLO와 torch(CUDA)를 설치한다.
-
+# ---------- 공통 ----------
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS base
 
 # 가상환경을 /app 밖에 둔다. /app에 소스를 마운트해도 가상환경이 가려지지 않는다.
@@ -11,9 +8,6 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
     PATH=/opt/venv/bin:$PATH
 
 WORKDIR /app
-
-# 의존성을 먼저 설치한다. 코드만 바뀌면 이 층은 캐시에서 다시 쓴다.
-# uv.lock이 생기면 `uv sync`에 `--locked`를 붙인다.
 
 # ---------- 전처리 환경 ----------
 FROM base AS prep
