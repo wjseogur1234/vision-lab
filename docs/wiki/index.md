@@ -8,7 +8,13 @@
 - [[overview]] — 프로젝트 목표·진행 단계·열린 질문
 
 ## 데이터 — 데이터셋 구조, 전처리, 불러오기
-_(없음)_
+### 원본 데이터셋
+- [[aihub-101-cctv]] — AI Hub 101 CCTV 교통 데이터. Bbox·Tracking·Segmantation 구조, 라벨 JSON 형식, 수치 (주 데이터셋)
+- [[aihub-095-accident]] — AI Hub 095 교통사고 영상. mp4와 영상 단위 JSON, 상자 라벨 없음
+- [[aihub-110-child-zone]] — AI Hub 110 어린이 보호구역 위험행동. 4K 프레임, VOC XML, 행동별 받은 범위
+
+### 전처리
+- [[dataset-split-plan]] — 분할 계획. 장소 단위 분할, 선택 압축 풀기, YOLO 결과 구조 (제안, 미결정)
 
 ## 모델 — 학습, 추론·API, 평가
 _(없음)_
