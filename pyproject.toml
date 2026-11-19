@@ -15,7 +15,7 @@ prep = [
 ]
 # ---------- 학습 환경 ----------
 train = [
-    "libreyolo>=1.7.4",
+    "libreyolo==1.8.0",
     # LibreYOLO의 의존성이지만, 아래 CUDA 인덱스를 적용하려고 직접 적는다.
     "torch>=2.4.0",
     "torchvision>=0.19.0",

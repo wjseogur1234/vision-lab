@@ -9,3 +9,7 @@
 - 근거: `/mnt/data1/downloads/교통데이터`의 원본 폴더와 zip을 직접 읽었다. `raw/`에 ingest한 문서는 없다.
 - 생성: [[aihub-101-cctv]], [[aihub-095-accident]], [[aihub-110-child-zone]], [[dataset-split-plan]]
 - 갱신: [[index]], [[overview]]
+
+## [2026-11-19] query | LibreYOLO 보행자 검출 모델
+- 생성: [[libreyolo-models]], [[libreyolo-model-reference]]
+- 갱신: [[index]]

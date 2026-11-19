@@ -17,7 +17,9 @@
 - [[dataset-split-plan]] — 분할 계획. 장소 단위 분할, 선택 압축 풀기, YOLO 결과 구조 (제안, 미결정)
 
 ## 모델 — 학습, 추론·API, 평가
-_(없음)_
+### 객체 검출
+- [[libreyolo-models]] — 보행자 검출 후보, 설치 조건, 검증 범위
 
 ## 자료 — 원자료 요약 (sources)
-_(없음)_
+### 공식 문서
+- [[libreyolo-model-reference]] — LibreYOLO 모델 목록과 PyPI 배포 정보
