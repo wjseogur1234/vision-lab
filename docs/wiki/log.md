@@ -13,3 +13,7 @@
 ## [2026-11-19] query | LibreYOLO 보행자 검출 모델
 - 생성: [[libreyolo-models]], [[libreyolo-model-reference]]
 - 갱신: [[index]]
+
+## [2026-11-20] query | data/raw 데이터셋 구성
+- 근거: `data/raw/`의 링크, 폴더, 파일 수를 확인했다.
+- 갱신: [[aihub-095-accident]], [[aihub-101-cctv]], [[aihub-110-child-zone]], [[dataset-split-plan]], [[overview]], [[index]]
