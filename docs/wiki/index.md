@@ -15,6 +15,7 @@
 
 ### 전처리
 - [dataset-split-plan](analyses/dataset-split-plan.md) — 분할 계획. 장소 단위 분할, 입력 파일 대응, YOLO 결과 구조 (제안, 미결정)
+- [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md) — 작업별 라벨, YAML, 파일 구조
 
 ## 모델 — 학습, 추론·API, 평가
 ### 객체 검출

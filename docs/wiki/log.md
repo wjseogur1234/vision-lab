@@ -23,3 +23,11 @@
 
 ## [2026-11-20] schema | 상대 경로 Markdown 링크
 - 갱신: [위키 규칙](../AGENTS.md)
+
+## [2026-11-21] query | LibreYOLO 모델별 검출 데이터 형식
+- 갱신: [libreyolo-models](analyses/libreyolo-models.md), [libreyolo-model-reference](sources/libreyolo-model-reference.md)
+
+## [2026-11-21] query | LibreYOLO 데이터셋 규격
+- 근거: 사용자가 제공한 데이터셋 형식 문서.
+- 생성: [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md)
+- 갱신: [index](index.md), [dataset-split-plan](analyses/dataset-split-plan.md), [libreyolo-models](analyses/libreyolo-models.md), [libreyolo-model-reference](sources/libreyolo-model-reference.md)
