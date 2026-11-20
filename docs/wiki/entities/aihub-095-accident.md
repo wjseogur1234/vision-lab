@@ -77,4 +77,4 @@ updated: 2026-11-20
 - 보행자 검출 학습에는 쓰지 않는다. 상자 라벨이 없다.
 - 학습한 모델의 추론 결과를 눈으로 확인하는 영상으로 쓸 수 있다(Phase 2).
 
-관련 데이터셋: [[aihub-101-cctv]], [[aihub-110-child-zone]]
+관련 데이터셋: [aihub-101-cctv](aihub-101-cctv.md), [aihub-110-child-zone](aihub-110-child-zone.md)

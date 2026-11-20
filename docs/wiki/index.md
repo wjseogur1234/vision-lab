@@ -5,21 +5,21 @@
 
 ## 기획 — 목표, 요구사항, 탐지 대상
 ### 종합
-- [[overview]] — 프로젝트 목표·진행 단계·열린 질문
+- [overview](overview.md) — 프로젝트 목표·진행 단계·열린 질문
 
 ## 데이터 — 데이터셋 구조, 전처리, 불러오기
 ### 원본 데이터셋
-- [[aihub-101-cctv]] — AI Hub 101 CCTV 교통 데이터. Bbox·Tracking·Segmantation 구조, 라벨 JSON 형식, 수치 (주 데이터셋)
-- [[aihub-095-accident]] — AI Hub 095 교통사고 영상. mp4와 영상 단위 JSON, 상자 라벨 없음
-- [[aihub-110-child-zone]] — AI Hub 110 어린이 보호구역 위험행동. 4K 프레임, VOC XML, 현재 파일 수
+- [aihub-101-cctv](entities/aihub-101-cctv.md) — AI Hub 101 CCTV 교통 데이터. Bbox·Tracking·Segmantation 구조, 라벨 JSON 형식, 수치 (주 데이터셋)
+- [aihub-095-accident](entities/aihub-095-accident.md) — AI Hub 095 교통사고 영상. mp4와 영상 단위 JSON, 상자 라벨 없음
+- [aihub-110-child-zone](entities/aihub-110-child-zone.md) — AI Hub 110 어린이 보호구역 위험행동. 4K 프레임, VOC XML, 현재 파일 수
 
 ### 전처리
-- [[dataset-split-plan]] — 분할 계획. 장소 단위 분할, 입력 파일 대응, YOLO 결과 구조 (제안, 미결정)
+- [dataset-split-plan](analyses/dataset-split-plan.md) — 분할 계획. 장소 단위 분할, 입력 파일 대응, YOLO 결과 구조 (제안, 미결정)
 
 ## 모델 — 학습, 추론·API, 평가
 ### 객체 검출
-- [[libreyolo-models]] — 보행자 검출 후보, 설치 조건, 검증 범위
+- [libreyolo-models](analyses/libreyolo-models.md) — 보행자 검출 후보, 설치 조건, 검증 범위
 
 ## 자료 — 원자료 요약 (sources)
 ### 공식 문서
-- [[libreyolo-model-reference]] — LibreYOLO 모델 목록과 PyPI 배포 정보
+- [libreyolo-model-reference](sources/libreyolo-model-reference.md) — LibreYOLO 모델 목록과 PyPI 배포 정보

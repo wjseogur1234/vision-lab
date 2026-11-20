@@ -68,20 +68,26 @@ wiki/
 ## 페이지 규칙
 
 - 파일명: 영어 소문자 kebab-case (`social-lstm.md`). 본문은 한국어.
-- 링크: 위키링크 `[[social-lstm]]` (파일명 유일하게 유지). 없는 페이지로의 링크는 "만들 후보"로 허용.
+- 본문 링크는 상대 경로 Markdown 링크를 쓴다.
+  예: `[AI Hub 101](../entities/aihub-101-cctv.md)`
+- 절 링크에는 제목 앵커를 붙인다.
+  예: `[2.1절](../entities/aihub-101-cctv.md#21-실제-파일-수)`
+- 파일명은 위키 안에서 유일하게 유지한다.
+- 아직 없는 페이지는 링크 없이 작성 후보로 적는다.
 - 모든 페이지에 YAML frontmatter (Dataview 용):
 
 ```yaml
 ---
 type: source | entity | concept | analysis | requirements | overview
 tags: []
-sources: [[source-page]] 목록   # 근거 source 페이지
+sources: ["[[source-page]]"]  # Dataview용 위키링크 목록
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---
 ```
 - source 페이지 추가 필드: `raw: raw/파일명`, `authors`, `year`, `url`.
-- 주장에는 출처 링크를 붙인다: `... (출처: [[some-paper-2024]])`.
+- 주장에는 출처 링크를 붙인다.
+  예: `[출처](../sources/some-paper-2024.md)`
 - 소스 간 **모순**은 지우지 말고 `> [!warning] 모순` callout으로 양쪽을 기록한다.
 - 새 소스가 기존 주장을 대체하면 `> [!note] 갱신됨` 으로 이력을 남긴다.
 - 추측은 `> [!question]` callout으로 사실과 구분한다.
@@ -102,7 +108,7 @@ updated: YYYY-MM-DD
 
 ### Query — 질문
 1. `index.md`를 먼저 읽고 관련 페이지를 찾아 읽는다 (필요하면 grep).
-2. 인용(위키링크)과 함께 답한다. 형식은 질문에 맞게: 문단, 비교표, Marp 슬라이드, matplotlib 차트 등.
+2. 출처 링크와 함께 답한다. 형식은 질문에 맞게: 문단, 비교표, Marp 슬라이드, matplotlib 차트 등.
 3. 재사용 가치가 있는 답은 `wiki/analyses/`에 저장하고 index/log 갱신 (사람에게 저장 여부를 제안).
 
 ### Lint — "lint 해줘"
@@ -117,13 +123,13 @@ updated: YYYY-MM-DD
 ## index.md / log.md
 
 - `index.md`: 주제별 대분류(기획 / 데이터 / 모델 / 자료) → 중분류 → 페이지 목록. "목차 구성 지침"을 따른다.
-  각 줄: `- [[slug]] — 한 줄 요약 (메타: 연도, 소스 수 등)`. 모든 ingest마다 갱신.
+  각 줄: `- [slug](분류/slug.md) — 한 줄 요약`. 모든 ingest마다 갱신.
 - `log.md`: append-only, 최신이 아래. 모든 항목은 다음 접두사로 시작 (grep 가능):
 
 ```
 ## [YYYY-MM-DD] ingest | 소스 제목
-- 생성: [[a]], [[b]]
-- 갱신: [[c]], [[overview]]
+- 생성: [a](entities/a.md), [b](sources/b.md)
+- 갱신: [c](analyses/c.md), [overview](overview.md)
 ```
   작업 종류: `ingest` / `query` / `lint` / `schema`.
   최근 기록 확인: `grep "^## \[" wiki/log.md | tail -5`

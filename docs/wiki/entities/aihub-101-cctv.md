@@ -9,7 +9,7 @@ updated: 2026-11-20
 # AI Hub 101 — 교통문제 해결을 위한 CCTV 교통 데이터(시내도로)
 
 이 프로젝트의 주 데이터셋이다. 첫 과제(보행자 검출)에는 `교통안전(Bbox)`를 쓴다.
-분할 방법은 [[dataset-split-plan]]에 적는다.
+분할 방법은 [dataset-split-plan](../analyses/dataset-split-plan.md)에 적는다.
 
 > [!note] 근거
 > 2026-11-20에 `data/raw/`의 파일을 확인했다.
@@ -61,7 +61,7 @@ Training Tracking JPG 수는 추가분 31,200장을 포함한다.
 | 보행자 상자 | 247,269개 | 31,294개 |
 | 촬영 구간(`meta`) | 2,986개 | 1,526개 |
 
-- Validation의 카메라 45대는 모두 Training에도 있다. 이 점이 분할 방법을 정한다. ([[dataset-split-plan]] 2절)
+- Validation의 카메라 45대는 모두 Training에도 있다. 이 점이 분할 방법을 정한다. ([dataset-split-plan 2절](../analyses/dataset-split-plan.md#2-문제-공식-구분은-카메라가-겹친다))
 - 카메라 1대의 이미지 수(Training): 최소 1장, 중앙값 1,928장, 최대 7,064장.
 
 ### 3.2 클래스
@@ -163,4 +163,4 @@ COCO와 비슷하지만 표준과 다르다. 최상위 키는 `info`, `images`, 
 | Tracking | Phase 4(vision task 확장)의 후보다 |
 | Segmantation | Phase 4(vision task 확장)의 후보다 |
 
-관련 데이터셋: [[aihub-095-accident]], [[aihub-110-child-zone]]
+관련 데이터셋: [aihub-095-accident](aihub-095-accident.md), [aihub-110-child-zone](aihub-110-child-zone.md)
