@@ -20,3 +20,20 @@
 - 숫자, 날짜, 조건, 예외는 빠짐없이 그대로 둔다.
 - 해야 할 일은 동사로 분명하게 쓴다.
 - 읽기 어색할 만큼 딱딱해지면 조금 풀어도 된다.
+
+## 작업별 Docker 서비스
+
+프로젝트 루트에서 실행한다.
+
+| 작업 | 서비스 | 실행 명령 |
+|---|---|---|
+| 원본 점검, 데이터 분할, 라벨 변환 | `prep` | `docker compose run --rm prep` |
+| 모델 학습, 추론, 평가, CUDA 확인 | `train` | `docker compose run --rm train` |
+
+- `prep`에서 `data/raw/`를 읽고 `data/processed/`에 결과를 쓴다.
+- `.env`의 `RAW_DATA_DIR`은 `prep`에 읽기 전용으로 연결된다.
+- `train`은 `data/processed/`를 읽기 전용으로 읽는다.
+- 모델 작업에 필요한 NVIDIA GPU는 `train`에 할당된다.
+
+이미지를 다시 빌드하려면 명령에 `--build`를 추가한다.
+셸에서 `exit`를 실행하면 컨테이너가 삭제된다.
