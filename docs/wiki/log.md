@@ -31,3 +31,6 @@
 - 근거: 사용자가 제공한 데이터셋 형식 문서.
 - 생성: [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md)
 - 갱신: [index](index.md), [dataset-split-plan](analyses/dataset-split-plan.md), [libreyolo-models](analyses/libreyolo-models.md), [libreyolo-model-reference](sources/libreyolo-model-reference.md)
+
+## [2026-11-21] query | 라벨 형식을 COCO JSON으로 변경
+- 갱신: [dataset-split-plan](analyses/dataset-split-plan.md), [aihub-101-cctv](entities/aihub-101-cctv.md), [index](index.md)

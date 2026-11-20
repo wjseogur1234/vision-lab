@@ -14,7 +14,7 @@
 - [aihub-110-child-zone](entities/aihub-110-child-zone.md) — AI Hub 110 어린이 보호구역 위험행동. 4K 프레임, VOC XML, 현재 파일 수
 
 ### 전처리
-- [dataset-split-plan](analyses/dataset-split-plan.md) — 분할 계획. 장소 단위 분할, 입력 파일 대응, YOLO 결과 구조 (제안, 미결정)
+- [dataset-split-plan](analyses/dataset-split-plan.md) — 분할 계획. 장소 단위 분할, 입력 파일 대응, COCO JSON 결과 구조 (제안, 미결정)
 - [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md) — 작업별 라벨, YAML, 파일 구조
 
 ## 모델 — 학습, 추론·API, 평가

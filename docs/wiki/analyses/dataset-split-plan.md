@@ -1,9 +1,9 @@
 ---
 type: analysis
-tags: [dataset, split, preprocessing, yolo]
+tags: [dataset, split, preprocessing, coco]
 sources: []
 created: 2026-11-16
-updated: 2026-11-20
+updated: 2026-11-21
 ---
 
 # 데이터셋 분할 계획 — AI Hub 101 Bbox와 110
@@ -71,34 +71,44 @@ updated: 2026-11-20
 
 | 항목 | 제안 |
 |---|---|
-| 클래스 | 보행자 1개. 원본 7번을 YOLO 0번으로 바꾼다 |
+| 클래스 | 보행자 1개. 원본 7번을 COCO 카테고리 `person`으로 바꾼다 |
 | 오토바이(자전거) 6번 | 넣지 않는다 |
 | 보행자가 없는 이미지 | 전체의 10% 정도를 배경 이미지로 넣는다 |
 | 날씨, 시간대 | 거르지 않는다. `manifest.csv`에 기록만 한다 |
 
 ### 5.3 라벨 변환
 
-LibreYOLO 규격은 [데이터셋 형식](../concepts/libreyolo-dataset-formats.md#detect--객체-검출)을 참고한다.
+라벨 형식은 COCO JSON으로 정한다(2026-11-21). YOLO TXT는 쓰지 않는다.
+LibreYOLO 규격은 [데이터셋 형식](../concepts/libreyolo-dataset-formats.md#공통-yaml)을 참고한다.
 
-- `[x1, y1, x2, y2]` 픽셀 값을 YOLO 형식으로 바꾼다. YOLO 형식은 `클래스 중심x 중심y 너비 높이`이고, 값을 0~1로 나눈다.
+- 분할마다 JSON 파일 1개를 만든다.
+- `images`에 이미지마다 `id`, `file_name`, `width`, `height`를 적는다.
+- `annotations`에 상자마다 `id`, `image_id`, `category_id`, `bbox`, `area`, `iscrowd: 0`을 적는다.
+- `categories`에는 `{"id": 1, "name": "person"}` 1개만 둔다.
+- `[x1, y1, x2, y2]` 픽셀 값을 `bbox: [x, y, w, h]` 픽셀 값으로 바꾼다. 정규화하지 않는다.
+- `area`는 `w * h`로 적는다.
+- `file_name`은 분할 이미지 폴더 기준 상대 경로로 적는다.
 - 이미지 크기는 이미지 파일에서 읽는다. 라벨에 크기가 없다.
 - 이미지 밖으로 나간 좌표는 잘라 낸다.
+- 잘라 낸 뒤 `w` 또는 `h`가 0 이하인 상자는 버리고 기록한다.
+- 배경 이미지는 `images`에만 넣고 `annotations`에는 넣지 않는다.
 
 ### 5.4 결과 구조
 
 ```text
 <전처리 결과 경로>/aihub101-ped-v1/
 ├── images/{train,val,test}/<카메라ID>__<원본 파일 이름>.jpg
-├── labels/{train,val,test}/<카메라ID>__<원본 파일 이름>.txt
+├── annotations/{train,val,test}.json
 └── manifest.csv
 
 configs/data/
-├── aihub101-ped-v1.yaml          LibreYOLO에 넘기는 데이터셋 YAML
+├── aihub101-ped-v1.yaml          LibreYOLO에 넘기는 데이터셋 YAML (`annotations` 키 포함)
 └── aihub101-ped-v1.splits.yaml   장소별 분할 목록
 ```
 
 - 파일 이름 앞에 카메라 ID를 붙인다. 카메라가 달라도 이름이 겹치지 않는다.
 - `manifest.csv`에는 이미지마다 장소, 카메라, 날씨, 시간대, 해상도, 분할, 보행자 수를 적는다.
+- YAML의 `names`는 `{0: person}`으로 적는다. COCO의 카테고리 이름과 같아야 한다.
 - 폴더 이름에 버전(`v1`)을 넣는다. 거르는 기준을 바꾸면 `v2`를 새로 만든다.
 
 ### 5.5 진행 순서
