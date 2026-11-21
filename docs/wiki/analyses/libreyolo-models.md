@@ -81,5 +81,5 @@ COCO JSON을 쓸 때는 YAML에 `annotations`를 지정한다.
 프로젝트 루트에서 학습 컨테이너의 패키지 버전을 조회한다.
 
 ```sh
-docker compose run --rm train python -c 'from importlib.metadata import version; print(version("libreyolo"))'
+docker compose run --rm lab python -c 'from importlib.metadata import version; print(version("libreyolo"))'
 ```

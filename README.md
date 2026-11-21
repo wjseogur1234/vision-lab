@@ -16,7 +16,7 @@
 .
 ├── pyproject.toml        # 의존성. LibreYOLO(PyPI)와 torch CUDA 빌드를 지정한다
 ├── Dockerfile            # 실행 환경 이미지 (전처리, 학습)
-├── compose.yaml          # 컨테이너 실행 설정 (환경별 마운트, GPU)
+├── compose.yaml          # 컨테이너 실행 설정 (마운트, GPU)
 ├── configs/
 │   └── data/             # 데이터셋 YAML (LibreYOLO에 넘기는 파일)
 ├── src/
@@ -31,19 +31,13 @@ LibreYOLO는 고치지 않고 라이브러리로만 쓴다. 이 저장소에는 
 
 ## 환경 구성
 
-Docker로 환경을 만든다. 환경은 2개이고, 환경마다 Docker 서비스가 하나씩 있다.
-
-| 환경 | 하는 일 | 서비스 | 의존성 그룹 | GPU |
-|---|---|---|---|---|
-| 전처리 | 원본을 거르고 COCO JSON으로 변환한다 | `prep` | `prep` | 안 씀 |
-| 학습 | LibreYOLO로 학습하고 추론한다 | `train` | `train` | 씀 |
-
-학습 환경에서 GPU를 쓰려면 호스트에 NVIDIA 드라이버와 NVIDIA Container Toolkit이 있어야 한다.
+전처리, 학습, 추론은 Docker 서비스 `lab`에서 실행한다.
+호스트에는 NVIDIA 드라이버와 NVIDIA Container Toolkit이 필요하다.
 
 ### 의존성
 
 [uv](https://docs.astral.sh/uv/)로 의존성을 관리한다.
-이미지를 빌드할 때 `uv sync --group <그룹>`이 실행된다.
+빌드할 때 `uv.lock`에 따라 `prep`과 `train` 그룹을 함께 설치한다.
 호스트에서 `uv sync`를 실행하지 않아도 된다.
 
 - 가상환경은 컨테이너의 `/opt/venv`에 있다. `PATH`에 들어 있으므로 `python`을 바로 실행한다.
@@ -55,8 +49,7 @@ Docker로 환경을 만든다. 환경은 2개이고, 환경마다 Docker 서비�
 ```bash
 cp .env.example .env            # RAW_DATA_DIR에 원본 데이터 경로를 적는다
 docker compose build
-docker compose run --rm prep    # 전처리 환경의 셸을 연다
-docker compose run --rm train   # 학습 환경의 셸을 연다
+docker compose run --rm lab
 ```
 
 `run`은 빌드한 이미지를 재사용한다.
@@ -64,11 +57,11 @@ docker compose run --rm train   # 학습 환경의 셸을 연다
 셸에서 `exit`를 실행하면 컨테이너가 삭제된다.
 
 컨테이너를 유지하면서 작업할 수도 있다.
-다음 명령은 학습 환경을 시작하고 셸을 연다.
+다음 명령은 `lab`을 시작하고 셸을 연다.
 
 ```bash
-docker compose up -d train
-docker compose exec train bash
+docker compose up -d lab
+docker compose exec lab bash
 ```
 
 다른 터미널에서도 `exec` 명령으로 셸을 열 수 있다.
@@ -76,10 +69,9 @@ docker compose exec train bash
 작업이 끝나면 컨테이너를 중지한다.
 
 ```bash
-docker compose stop train
+docker compose stop lab
 ```
 
-전처리 환경은 `train` 대신 `prep`을 쓴다.
 `run`으로 만든 컨테이너에 접속하려면 이름을 확인한다.
 
 ```bash
@@ -90,17 +82,15 @@ docker exec -it <컨테이너_이름> bash
 프로젝트 폴더에 저장한 파일은 컨테이너가 삭제돼도 남는다.
 컨테이너 내부의 다른 위치에 저장한 파일은 삭제될 수 있다.
 
-| 마운트 | 전처리 (`prep`) | 학습 (`train`) |
-|---|---|---|
-| 소스 (`/app`) | 쓰기 가능 | 쓰기 가능 |
-| 원본 데이터 | 읽기 전용 | 마운트 안 함 |
-| `data/processed/` | 쓰기 가능 | 읽기 전용 |
-| HDD 중간 파일 | 쓰기 가능 | 쓰기 가능 |
+| 마운트 | 접근 권한 |
+|---|---|
+| 소스 (`/app`) | 쓰기 가능 |
+| 원본 데이터 | 읽기 전용 |
+| `data/processed/` | 쓰기 가능 |
+| HDD 중간 파일 | 쓰기 가능 |
 
 원본 데이터는 호스트와 같은 경로에 마운트한다.
-학습 환경은 전처리 결과만 읽는다.
 `data/interim/HDD/project_261121`은 HDD의 중간 파일 폴더를 가리킨다.
-두 서비스에서 이 경로로 HDD에 파일을 쓸 수 있다.
 마운트 설정을 바꾼 뒤에는 컨테이너를 다시 만들어야 한다.
 
 ## 데이터
