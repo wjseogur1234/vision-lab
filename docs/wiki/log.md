@@ -38,3 +38,6 @@
 ## [2026-11-21] query | manifest.csv 구성 확정
 - 결정: COCO JSON과 별도 CSV로 둔다.
 - 갱신: [dataset-split-plan](analyses/dataset-split-plan.md)
+
+## [2026-11-21] lint | 데이터셋 계획과 실행 환경 정리
+- 갱신: [dataset-split-plan](analyses/dataset-split-plan.md), [libreyolo-models](analyses/libreyolo-models.md)

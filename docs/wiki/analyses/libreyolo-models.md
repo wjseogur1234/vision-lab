@@ -15,9 +15,8 @@ updated: 2026-11-21
 
 - `train` 그룹은 `libreyolo==1.8.0`를 지정한다. [pyproject.toml](../../../pyproject.toml)
 - 확인일 기준 PyPI 최신 버전은 1.8.0이다. [libreyolo-model-reference](../sources/libreyolo-model-reference.md)
-- 작업 폴더에서 모델 가중치와 버전 잠금 파일을 찾지 못했다.
-- 호스트의 Python 3에서 LibreYOLO를 찾지 못했다.
-- Docker 소켓 권한이 없어 학습 컨테이너를 확인하지 못했다.
+- 의존성은 프로젝트의 `uv.lock`에 잠겨 있다.
+- Docker의 `lab` 서비스에서 학습 환경을 실행한다.
 - 모델 로딩과 학습은 실행하지 않았다.
 
 ## 보행자 박스 검출 후보
