@@ -31,6 +31,7 @@
 | 모델 학습, 추론, 평가, CUDA 확인 | `train` | `docker compose run --rm train` |
 
 - `prep`에서 `data/raw/`를 읽고 `data/processed/`에 결과를 쓴다.
+- 중간 파일은 `data/interim/`에 쓴다. 이 폴더는 지워도 된다.
 - `.env`의 `RAW_DATA_DIR`은 `prep`에 읽기 전용으로 연결된다.
 - `train`은 `data/processed/`를 읽기 전용으로 읽는다.
 - 모델 작업에 필요한 NVIDIA GPU는 `train`에 할당된다.

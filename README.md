@@ -31,26 +31,26 @@ LibreYOLO는 고치지 않고 라이브러리로만 쓴다. 이 저장소에는 
 
 ## 환경 구성
 
-[uv](https://docs.astral.sh/uv/)를 쓴다.
+Docker로 환경을 만든다. 환경은 2개이고, 환경마다 Docker 서비스가 하나씩 있다.
 
-환경은 2개다. 의존성 그룹으로 나눈다.
+| 환경 | 하는 일 | 서비스 | 의존성 그룹 | GPU |
+|---|---|---|---|---|
+| 전처리 | 원본을 거르고 COCO JSON으로 변환한다 | `prep` | `prep` | 안 씀 |
+| 학습 | LibreYOLO로 학습하고 추론한다 | `train` | `train` | 씀 |
 
-| 환경 | 하는 일 | 의존성 그룹 | GPU |
-|---|---|---|---|
-| 전처리 | 원본을 거르고 COCO JSON으로 변환한다 | `prep` | 안 씀 |
-| 학습 | LibreYOLO로 학습하고 추론한다 | `train` | 씀 |
-
-```bash
-uv sync --group prep     # 전처리 환경
-uv sync --group train    # 학습 환경
-```
-
-torch는 CUDA 12.8 빌드(`cu128`)를 받는다. 다른 GPU 환경에서는 `pyproject.toml`의 인덱스를 바꾼다.
-
-### Docker
-
-환경마다 서비스가 하나씩 있다.
 학습 환경에서 GPU를 쓰려면 호스트에 NVIDIA 드라이버와 NVIDIA Container Toolkit이 있어야 한다.
+
+### 의존성
+
+[uv](https://docs.astral.sh/uv/)로 의존성을 관리한다.
+이미지를 빌드할 때 `uv sync --group <그룹>`이 실행된다.
+호스트에서 `uv sync`를 실행하지 않아도 된다.
+
+- 가상환경은 컨테이너의 `/opt/venv`에 있다. `PATH`에 들어 있으므로 `python`을 바로 실행한다.
+- 의존성을 바꾸면 `pyproject.toml`을 고치고 `uv lock`을 실행한다. 그다음 이미지를 다시 빌드한다(`--build`).
+- torch는 CUDA 12.8 빌드(`cu128`)를 받는다. 다른 GPU 환경에서는 `pyproject.toml`의 인덱스를 바꾼다.
+
+### 실행
 
 ```bash
 cp .env.example .env            # RAW_DATA_DIR에 원본 데이터 경로를 적는다
