@@ -50,7 +50,7 @@ updated: 2026-11-21
 3. 장소를 train, val, test에 배정한다. 목표 비율은 보행자가 있는 이미지 기준으로 70%, 15%, 15%다.
 4. 배정할 때 다음을 맞춘다.
    - 세 묶음 모두에 `BC` 카메라와 `SC` 카메라가 들어간다.
-   - 세 묶음 모두에 FHD와 HD가 들어간다.
+   - 세 묶음 모두에 1920x1080과 1280x720 이미지가 들어간다.
 5. 배정 결과를 `configs/data/`의 파일에 적는다. 이 파일을 git에 올린다.
 6. test는 Phase 3의 최종 평가에만 쓴다. 학습 중 모델 선택에는 val만 쓴다.
 
@@ -107,9 +107,47 @@ configs/data/
 ```
 
 - 파일 이름 앞에 카메라 ID를 붙인다. 카메라가 달라도 이름이 겹치지 않는다.
-- `manifest.csv`에는 이미지마다 장소, 카메라, 날씨, 시간대, 해상도, 분할, 보행자 수를 적는다.
 - YAML의 `names`는 `{0: person}`으로 적는다. COCO의 카테고리 이름과 같아야 한다.
 - 폴더 이름에 버전(`v1`)을 넣는다. 거르는 기준을 바꾸면 `v2`를 새로 만든다.
+
+`manifest.csv`는 이미지 정보를 모은 표다. 이미지 1장이 1행이다. LibreYOLO는 이 파일을 읽지 않는다.
+`width`와 `height`는 COCO `images` 항목과 같은 값을 쓴다.
+
+| 열 | 내용 | 값 예 |
+|---|---|---|
+| `file_name` | 이미지 경로 | `train/BC01__xxx.jpg` |
+| `location` | 장소 | 원본의 장소 이름 |
+| `camera` | 카메라 ID | `BC01` |
+| `weather` | 날씨 | `sunny`, `rainy`, `cloudy`, `foggy`, `snow` |
+| `time_of_day` | 시간대 | `dawn`, `morning`, `day`, `afternoon` |
+| `width` | 이미지 너비 (픽셀) | `1920`, `1280` |
+| `height` | 이미지 높이 (픽셀) | `1080`, `720` |
+| `split` | 분할 | `train`, `val`, `test` |
+| `num_persons` | 보행자 상자 수 | `3` |
+
+값 규칙은 다음과 같다. 코드로 바로 거르고 셀 수 있게 한다.
+
+- 범주 값은 영어 소문자로 적는다.
+- `weather`는 원본 `weather` 값을 소문자로 바꾼다.
+- `time_of_day`는 원본 `time_space` 값을 바꾼다.
+
+| 원본 `time_space` | `time_of_day` |
+|---|---|
+| 새벽 | `dawn` |
+| 오전 | `morning` |
+| 낮 | `day` |
+| 오후 | `afternoon` |
+
+- 표에 없는 원본 값은 `unknown`으로 적고 로그에 남긴다.
+- `width`, `height`는 원본 `resolution`이 아니라 이미지 파일에서 읽는다. 원본 `resolution`에는 빈 값이 있다.
+- `num_persons`는 변환 후 남은 상자 수다.
+- 파일은 UTF-8, 쉼표 구분, 첫 행 열 이름으로 쓴다.
+
+- `file_name`은 COCO `images` 항목의 `file_name`과 같은 값을 쓴다. 이 열로 두 파일을 잇는다.
+- `manifest.csv`는 COCO JSON과 같은 실행에서 만든다. 두 파일이 어긋나지 않게 한다.
+- `manifest.csv`를 손으로 고치지 않는다. 바꿔야 하면 변환을 다시 실행한다.
+- `prep`에서 만들고 분할을 검증한다. 분할마다 `BC`/`SC` 카메라와 두 해상도가 있는지 센다.
+- `train`에서는 읽기만 한다. 평가 결과와 이어서 조건별 성능을 본다.
 
 ### 5.5 진행 순서
 

@@ -34,3 +34,7 @@
 
 ## [2026-11-21] query | 라벨 형식을 COCO JSON으로 변경
 - 갱신: [dataset-split-plan](analyses/dataset-split-plan.md), [aihub-101-cctv](entities/aihub-101-cctv.md), [index](index.md)
+
+## [2026-11-21] query | manifest.csv 구성 확정
+- 결정: COCO JSON과 별도 CSV로 둔다.
+- 갱신: [dataset-split-plan](analyses/dataset-split-plan.md)
