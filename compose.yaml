@@ -10,6 +10,7 @@ services:
       - .:/app
       # 호스트와 같은 경로에 마운트한다. data/raw/ 의 심볼릭 링크가 컨테이너 안에서도 맞는다.
       - ${RAW_DATA_DIR:?.env 파일에 RAW_DATA_DIR을 적는다}:${RAW_DATA_DIR}:ro
+      - /mnt/data1/downloads/dataset_hdd-8tb/interim/project_261121:/mnt/data1/downloads/dataset_hdd-8tb/interim/project_261121
     stdin_open: true
     tty: true
 
@@ -24,6 +25,7 @@ services:
       - .:/app
       # 학습 환경은 전처리 결과를 고치지 못한다. 원본 데이터는 마운트하지 않는다.
       - ./data/processed:/app/data/processed:ro
+      - /mnt/data1/downloads/dataset_hdd-8tb/interim/project_261121:/mnt/data1/downloads/dataset_hdd-8tb/interim/project_261121
     shm_size: "8gb"
     stdin_open: true
     tty: true
