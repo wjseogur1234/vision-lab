@@ -59,6 +59,37 @@ docker compose run --rm prep    # 전처리 환경의 셸을 연다
 docker compose run --rm train   # 학습 환경의 셸을 연다
 ```
 
+`run`은 빌드한 이미지를 재사용한다.
+실행할 때마다 새 컨테이너를 만든다.
+셸에서 `exit`를 실행하면 컨테이너가 삭제된다.
+
+컨테이너를 유지하면서 작업할 수도 있다.
+다음 명령은 학습 환경을 시작하고 셸을 연다.
+
+```bash
+docker compose up -d train
+docker compose exec train bash
+```
+
+다른 터미널에서도 `exec` 명령으로 셸을 열 수 있다.
+`exit`를 실행하면 해당 셸만 종료된다.
+작업이 끝나면 컨테이너를 중지한다.
+
+```bash
+docker compose stop train
+```
+
+전처리 환경은 `train` 대신 `prep`을 쓴다.
+`run`으로 만든 컨테이너에 접속하려면 이름을 확인한다.
+
+```bash
+docker compose ps -a
+docker exec -it <컨테이너_이름> bash
+```
+
+프로젝트 폴더에 저장한 파일은 컨테이너가 삭제돼도 남는다.
+컨테이너 내부의 다른 위치에 저장한 파일은 삭제될 수 있다.
+
 | 마운트 | 전처리 (`prep`) | 학습 (`train`) |
 |---|---|---|
 | 소스 (`/app`) | 쓰기 가능 | 쓰기 가능 |

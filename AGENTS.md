@@ -36,4 +36,16 @@
 - 모델 작업에 필요한 NVIDIA GPU는 `train`에 할당된다.
 
 이미지를 다시 빌드하려면 명령에 `--build`를 추가한다.
-셸에서 `exit`를 실행하면 컨테이너가 삭제된다.
+`run --rm`의 셸에서 `exit`를 실행하면 컨테이너가 삭제된다.
+
+컨테이너를 유지하려면 다음 명령을 쓴다.
+
+```bash
+docker compose up -d train
+docker compose exec train bash
+docker compose stop train
+```
+
+전처리 환경은 `train` 대신 `prep`을 쓴다.
+`exec` 셸에서 `exit`를 실행해도 컨테이너는 유지된다.
+프로젝트 폴더 밖의 파일은 컨테이너 삭제 시 사라질 수 있다.
