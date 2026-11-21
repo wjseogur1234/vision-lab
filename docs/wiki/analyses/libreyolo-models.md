@@ -1,7 +1,7 @@
 ---
 type: analysis
 tags: [libreyolo, object-detection]
-sources: ["[[libreyolo-model-reference]]"]
+sources: ["wiki/sources/libreyolo-model-reference.md"]
 created: 2026-11-19
 updated: 2026-11-21
 ---

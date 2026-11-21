@@ -80,11 +80,12 @@ wiki/
 ---
 type: source | entity | concept | analysis | requirements | overview
 tags: []
-sources: ["[[source-page]]"]  # Dataview용 위키링크 목록
+sources: ["wiki/sources/source-page.md"]  # docs/ 기준 경로 목록
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---
 ```
+- `sources`에는 `docs/` 기준 파일 경로를 적는다.
 - source 페이지 추가 필드: `raw: raw/파일명`, `authors`, `year`, `url`.
 - 주장에는 출처 링크를 붙인다.
   예: `[출처](../sources/some-paper-2024.md)`

@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [libreyolo, dataset, annotation]
-sources: ["[[libreyolo-model-reference]]"]
+sources: ["wiki/sources/libreyolo-model-reference.md"]
 created: 2026-11-21
 updated: 2026-11-21
 ---
