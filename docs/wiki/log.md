@@ -41,3 +41,7 @@
 
 ## [2026-11-21] lint | 데이터셋 계획과 실행 환경 정리
 - 갱신: [dataset-split-plan](analyses/dataset-split-plan.md), [libreyolo-models](analyses/libreyolo-models.md)
+
+## [2026-11-21] lint | manifest 이미지 경로 예시 수정
+- 관련 커밋: `6aa44ac`
+- 갱신: [dataset-split-plan](analyses/dataset-split-plan.md)

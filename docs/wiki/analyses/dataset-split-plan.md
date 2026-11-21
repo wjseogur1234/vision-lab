@@ -115,7 +115,7 @@ configs/data/
 
 | 열 | 내용 | 값 예 |
 |---|---|---|
-| `file_name` | 이미지 경로 | `train/BC01__xxx.jpg` |
+| `file_name` | 분할 이미지 폴더 기준 경로 | `BC01__xxx.jpg` |
 | `location` | 장소 | 원본의 장소 이름 |
 | `camera` | 카메라 ID | `BC01` |
 | `weather` | 날씨 | `sunny`, `rainy`, `cloudy`, `foggy`, `snow` |
