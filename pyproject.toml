@@ -9,6 +9,7 @@ dependencies = []
 [dependency-groups]
 # ---------- 전처리 환경 ----------
 prep = [
+    "pandas>=2.3.3",
     "pillow>=11.0",
     "pycocotools>=2.0.11",
     "pyyaml>=6.0",
