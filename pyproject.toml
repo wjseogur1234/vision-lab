@@ -10,6 +10,7 @@ dependencies = []
 # ---------- 전처리 환경 ----------
 prep = [
     "pillow>=11.0",
+    "pycocotools>=2.0.11",
     "pyyaml>=6.0",
     "tqdm>=4.66",
 ]
