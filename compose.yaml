@@ -2,6 +2,9 @@ services:
   lab:
     build:
       context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     image: vision-lab
     working_dir: /app
     volumes:
