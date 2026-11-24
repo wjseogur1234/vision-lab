@@ -110,11 +110,11 @@ AI Hub `101.교통문제 해결을 위한 CCTV 교통 데이터(시내도로)`�
 
 ```bash
 docker compose run --rm lab python -m data.raw_manifest
-docker compose run --rm lab python -m data.raw_manifest --dataset 101
+docker compose run --rm lab python -m data.raw_manifest dataset=[101]
 ```
 
 기본 결과 경로는 `data/interim/raw-manifests/<데이터셋 번호>/manifest.csv`다.
-`--output-dir`로 결과 경로를 바꿀 수 있다.
+`output_dir=<경로>`로 결과 경로를 바꿀 수 있다.
 파일 경로는 각 원본 데이터셋 폴더를 기준으로 기록한다.
 
 - `095`는 MP4와 사고 JSON을 연결한다.
@@ -130,10 +130,14 @@ docker compose run --rm lab python -m data.raw_manifest --dataset 101
 ```bash
 docker compose run --rm lab python -m data.split_locations
 docker compose run --rm lab python -m data.build_coco
-docker compose run --rm lab python -m data.build_coco --name aihub101-ped-mini --fraction 0.065
+docker compose run --rm lab python -m data.build_coco name=aihub101-ped-mini fraction=0.065
 ```
 
-- `split_locations`는 장소 단위 분할 안을 `configs/data/aihub101-ped-v1.splits.yaml`에 쓴다.
+- 기본 설정은 `configs/prep/<스크립트 이름>.yaml`에 있다.
+- 설정은 `키=값` 형식으로 덮어쓴다. `--cfg job`을 붙이면 최종 설정을 보여 준다.
+- `split_locations`는 장소 단위 분할 안을 `configs/data/aihub101-ped-v2.splits.yaml`에 쓴다.
+- `build_coco`는 분할 파일을 Hydra로 읽는다. 기본값은 `aihub101-ped-v1.splits`다.
+- 분할 파일을 바꾸려면 `data@split_plan=aihub101-ped-v2.splits`를 붙인다.
 - `build_coco`는 `data/processed/<이름>/`에 COCO JSON과 manifest를 쓴다.
 - `build_coco`는 LibreYOLO YAML을 `configs/data/<이름>.yaml`에 쓴다.
 - 이미지는 복사하지 않는다. COCO `file_name`은 `data/raw/` 기준 원본 경로다.

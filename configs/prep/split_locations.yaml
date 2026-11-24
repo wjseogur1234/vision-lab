@@ -1,0 +1,22 @@
+# python -m data.split_locations
+defaults:
+  - common
+  - _self_
+
+manifest: data/interim/raw-manifests/101/manifest.csv
+output: configs/data/aihub101-ped-v2.splits.yaml
+# 분할별 목표 비율. 키 순서가 분할 순서다. 첫 분할이 train이다.
+ratios:
+  train: 0.7
+  val: 0.15
+  test: 0.15
+seed: 0
+trials: 200
+# val, test에 둘 큰 장소의 최소 수
+min_locations: 6
+# 큰 장소로 셀 보행자 이미지 수의 하한
+min_person_images: 500
+# 모든 분할에 둘 카메라 종류. 이 밖의 종류(AY)가 있는 장소는 train에 둔다.
+required_kinds: [BC, SC]
+# 모든 분할에 둘 이미지 높이
+required_heights: ["1080", "720"]

@@ -3,7 +3,6 @@
 이미지는 복사하지 않는다. COCO `file_name`에 `data/raw/` 기준 원본 경로를 적는다.
 """
 
-import argparse
 import csv
 import json
 import logging
@@ -12,29 +11,16 @@ import shutil
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
-from pathlib import Path
 
+import hydra
 import yaml
+from hydra.core.hydra_config import HydraConfig
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-SPLITS = ("train", "val", "test")
-PERSON = 7
-MANIFEST_FIELDS = (
-    "file_name", "split", "location", "camera", "weather", "time_of_day",
-    "width", "height", "num_persons", "source_split", "label_file", "label_image_id",
-)
-ISSUE_FIELDS = ("file_name", "issue", "detail")
+from data.config import CONFIG_PATH, setup_logging, to_args
 
 logger = logging.getLogger(__name__)
-
-
-def setup_logging(level):
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-        datefmt="%H:%M:%S",
-    )
 
 
 def read_manifest(path):
@@ -42,18 +28,19 @@ def read_manifest(path):
         return list(csv.DictReader(stream))
 
 
-def load_splits(path):
-    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+def load_splits(split_plan):
+    """분할 안을 (분할 이름 목록, 장소별 분할)로 바꾼다. 분할 안은 Hydra가 읽는다."""
+    split_names = list(split_plan["splits"])
     split_of = {}
-    for split in SPLITS:
-        for location in document["splits"][split]:
+    for split in split_names:
+        for location in split_plan["splits"][split] or []:
             if location in split_of:
                 raise ValueError(f"장소가 두 분할에 있습니다: {location}")
             split_of[location] = split
-    return split_of
+    return split_names, split_of
 
 
-def person_boxes(dataset_root, label_file, cache):
+def person_boxes(dataset_root, label_file, category_id, cache):
     """라벨 JSON 하나를 읽어 이미지 ID별 보행자 상자 목록을 돌려준다."""
     if label_file not in cache:
         cache.clear()  # 같은 라벨 파일의 행이 이어지므로 하나만 둔다.
@@ -63,7 +50,7 @@ def person_boxes(dataset_root, label_file, cache):
         boxes = defaultdict(list)
         for annotation in data["annotations"]:
             for bbox, category in zip(annotation["bbox"], annotation["category_id"]):
-                if category == PERSON:
+                if category == category_id:
                     boxes[annotation["image_id"]].append(bbox)
         cache[label_file] = boxes
     return cache[label_file]
@@ -80,13 +67,14 @@ def clip_box(box, width, height):
 
 def collect(args):
     dataset_root = args.raw_dir / args.dataset_folder
-    split_of = load_splits(args.splits)
-    logger.info("분할 파일: %s (장소 %d곳)", args.splits, len(split_of))
+    split_names, split_of = load_splits(args.split_plan)
+    args.split_names = split_names
+    logger.info("분할 안: %s (분할 %s, 장소 %d곳)", args.splits_file, split_names, len(split_of))
     issues = []
     rows = sorted(read_manifest(args.manifest), key=lambda row: row.get("label_file") or "")
     logger.info("manifest: %s (%d행)", args.manifest, len(rows))
     cache = {}
-    items = {split: {"person": [], "background": []} for split in SPLITS}
+    items = {split: {"person": [], "background": []} for split in args.split_names}
     for row in tqdm(rows, desc="라벨 매칭", unit="장"):
         file_name = f"{args.dataset_folder}/{row['file_name']}" if row["file_name"] else ""
         if row["match_status"] != "matched":
@@ -98,7 +86,10 @@ def collect(args):
             continue
         width, height = int(row["width"]), int(row["height"])
         boxes = []
-        raw = person_boxes(dataset_root, row["label_file"], cache).get(int(row["label_image_id"]))
+        boxes_by_image = person_boxes(
+            dataset_root, row["label_file"], args.source_category, cache
+        )
+        raw = boxes_by_image.get(int(row["label_image_id"]))
         for box in raw or []:
             clipped = clip_box(box, width, height)
             if clipped[2] <= 0 or clipped[3] <= 0:
@@ -107,7 +98,7 @@ def collect(args):
             boxes.append(clipped)
         item = {"row": row, "file_name": file_name, "split": split, "boxes": boxes}
         items[split]["person" if boxes else "background"].append(item)
-    for split in SPLITS:
+    for split in args.split_names:
         logger.info(
             "%s 후보: 보행자 이미지 %d, 배경 이미지 %d",
             split, len(items[split]["person"]), len(items[split]["background"]),
@@ -117,11 +108,11 @@ def collect(args):
     return items, issues
 
 
-def select(items, background_ratio, fraction, seed):
+def select(items, split_names, background_ratio, fraction, seed):
     """분할마다 배경 이미지를 뽑고, 필요하면 전체를 줄인다."""
     rng = random.Random(seed)
     selected = {}
-    for split in SPLITS:
+    for split in split_names:
         persons = sorted(items[split]["person"], key=lambda item: item["file_name"])
         backgrounds = sorted(items[split]["background"], key=lambda item: item["file_name"])
         if fraction < 1:
@@ -136,7 +127,7 @@ def select(items, background_ratio, fraction, seed):
     return selected
 
 
-def coco_document(items):
+def coco_document(items, class_name):
     images, annotations = [], []
     for image_id, item in enumerate(items, start=1):
         row = item["row"]
@@ -158,7 +149,7 @@ def coco_document(items):
     return {
         "images": images,
         "annotations": annotations,
-        "categories": [{"id": 1, "name": "person"}],
+        "categories": [{"id": 1, "name": class_name}],
     }
 
 
@@ -172,15 +163,15 @@ def write_csv(path, fields, rows):
 def write_dataset(args, selected, issues):
     destination = args.output_dir / args.name
     if destination.exists() and not args.overwrite:
-        raise FileExistsError(f"이미 있습니다: {destination}. 버전을 올리거나 --overwrite를 쓴다.")
+        raise FileExistsError(f"이미 있습니다: {destination}. 버전을 올리거나 overwrite=true를 쓴다.")
     temporary = destination.with_name(destination.name + ".tmp")
     shutil.rmtree(temporary, ignore_errors=True)
     (temporary / "annotations").mkdir(parents=True)
 
     summary = {}
     manifest_rows = []
-    for split in tqdm(SPLITS, desc="COCO 쓰기", unit="분할"):
-        document = coco_document(selected[split])
+    for split in tqdm(args.split_names, desc="COCO 쓰기", unit="분할"):
+        document = coco_document(selected[split], args.class_name)
         with (temporary / "annotations" / f"{split}.json").open("w", encoding="utf-8") as stream:
             json.dump(document, stream, ensure_ascii=False)
         summary[split] = {
@@ -196,19 +187,20 @@ def write_dataset(args, selected, issues):
                     "num_persons": len(item["boxes"]),
                 }
             )
-    write_csv(temporary / "manifest.csv", MANIFEST_FIELDS, manifest_rows)
-    write_csv(temporary / "issues.csv", ISSUE_FIELDS, [dict(zip(ISSUE_FIELDS, i)) for i in issues])
+    write_csv(temporary / "manifest.csv", args.manifest_fields, manifest_rows)
+    issue_rows = [dict(zip(args.issue_fields, issue)) for issue in issues]
+    write_csv(temporary / "issues.csv", args.issue_fields, issue_rows)
 
     metadata = {
         "name": args.name,
         "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "command": " ".join(sys.argv),
         "source_manifest": args.manifest.as_posix(),
-        "splits_file": args.splits.as_posix(),
+        "splits_file": args.splits_file,
         "dataset_folder": args.dataset_folder,
         "image_root": "data/raw",
-        "classes": {1: "person"},
-        "source_category": PERSON,
+        "classes": {1: args.class_name},
+        "source_category": args.source_category,
         "background_ratio": args.background_ratio,
         "fraction": args.fraction,
         "seed": args.seed,
@@ -228,14 +220,10 @@ def write_dataset(args, selected, issues):
 def write_config(args, destination):
     """LibreYOLO에 넘기는 데이터셋 YAML을 쓴다."""
     image_root = args.raw_dir.absolute().as_posix()
-    config = {
-        "path": destination.absolute().as_posix(),
-        "train": image_root,
-        "val": image_root,
-        "test": image_root,
-        "annotations": {split: f"annotations/{split}.json" for split in SPLITS},
-        "names": {0: "person"},
-    }
+    config = {"path": destination.absolute().as_posix()}
+    config |= {split: image_root for split in args.split_names}
+    config["annotations"] = {split: f"annotations/{split}.json" for split in args.split_names}
+    config["names"] = {0: args.class_name}
     path = args.config_dir / f"{args.name}.yaml"
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as stream:
@@ -245,33 +233,23 @@ def write_config(args, destination):
     return path
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--name", default="aihub101-ped-v1")
-    parser.add_argument(
-        "--manifest", type=Path, default=Path("data/interim/raw-manifests/101/manifest.csv")
-    )
-    parser.add_argument(
-        "--splits", type=Path, default=Path("configs/data/aihub101-ped-v1.splits.yaml")
-    )
-    parser.add_argument("--raw-dir", type=Path, default=Path("data/raw"))
-    parser.add_argument("--dataset-folder", default="101.교통문제_해결을_위한_CCTV_교통_데이터(시내도로)")
-    parser.add_argument("--output-dir", type=Path, default=Path("data/processed"))
-    parser.add_argument("--config-dir", type=Path, default=Path("configs/data"))
-    parser.add_argument("--background-ratio", type=float, default=0.1)
-    parser.add_argument("--fraction", type=float, default=1.0, help="보행자 이미지를 뽑는 비율")
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--overwrite", action="store_true")
-    parser.add_argument("--log-level", default="INFO", choices=("DEBUG", "INFO", "WARNING"))
-    args = parser.parse_args()
-    setup_logging(args.log_level)
+@hydra.main(version_base=None, config_path=CONFIG_PATH, config_name="build_coco")
+def main(cfg):
+    paths = ("manifest", "raw_dir", "output_dir", "config_dir")
+    args = to_args(cfg, paths=paths)
+    setup_logging(args.log_level, args.log_levels)
+    # 어떤 분할 파일을 골랐는지 metadata에 남긴다.
+    args.splits_file = f"configs/data/{HydraConfig.get().runtime.choices['data@split_plan']}.yaml"
     if not 0 <= args.background_ratio < 1 or not 0 < args.fraction <= 1:
-        parser.error("--background-ratio는 [0, 1), --fraction은 (0, 1] 범위여야 합니다.")
+        logger.error("background_ratio는 [0, 1), fraction은 (0, 1] 범위여야 합니다.")
+        sys.exit(2)
 
     try:
         with logging_redirect_tqdm():
             items, issues = collect(args)
-            selected = select(items, args.background_ratio, args.fraction, args.seed)
+            selected = select(
+                items, args.split_names, args.background_ratio, args.fraction, args.seed
+            )
             destination, metadata = write_dataset(args, selected, issues)
     except (OSError, ValueError, KeyError) as error:
         logger.error("%s", error)

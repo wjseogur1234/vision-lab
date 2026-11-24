@@ -9,6 +9,7 @@ dependencies = []
 [dependency-groups]
 # ---------- 전처리 환경 ----------
 prep = [
+    "hydra-core>=1.3.2",
     "pandas>=2.3.3",
     "pillow>=11.0",
     "pycocotools>=2.0.11",
