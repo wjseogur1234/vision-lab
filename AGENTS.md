@@ -32,4 +32,18 @@
 - `.env`의 `RAW_DATA_DIR`은 읽기 전용으로 연결된다.
 - 호스트의 NVIDIA GPU를 `lab`에 할당한다.
 
+### 의존성 변경과 실행
+
+호스트에서 `uv`, `python`을 실행하지 않는다. 호스트에 `.venv`를 만들지 않는다.
+의존성 변경과 스크립트 실행은 모두 `lab`에서 한다.
+
+```bash
+docker compose run --rm lab uv add --group prep <패키지>
+docker compose run --rm lab python -m data.build_coco --cfg job
+```
+
+- 의존성을 바꾸면 이미지를 다시 빌드한다(`docker compose build lab`).
+- `uv add`가 `/opt/venv` 권한 문제로 실패하면 `pyproject.toml`을 고친다.
+  그다음 `lab`에서 `uv lock`을 실행하고 이미지를 다시 빌드한다.
+
 프로젝트 폴더 밖의 파일은 컨테이너 삭제 시 사라질 수 있다.
