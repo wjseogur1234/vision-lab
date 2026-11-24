@@ -4,17 +4,16 @@
 결과는 YAML로 쓴다. 사람이 검토한 뒤 git에 올린다.
 """
 
-import argparse
 import csv
 import logging
 import random
 from collections import defaultdict
-from pathlib import Path
 
+import hydra
 import yaml
 from tqdm import tqdm
 
-SPLITS = ("train", "val", "test")
+from data.config import CONFIG_PATH, setup_logging, to_args
 
 logger = logging.getLogger(__name__)
 
@@ -55,17 +54,18 @@ def score(stats, groups, targets, kinds, heights, min_locations, min_person_imag
     return penalty, error
 
 
-def propose(stats, ratios, seed, trials, min_locations, min_person_images):
+def propose(stats, ratios, seed, trials, min_locations, min_person_images, kinds, heights):
     total = sum(item["person_images"] for item in stats.values())
+    split_count = len(ratios)
     targets = [ratio * total for ratio in ratios]
-    # 모든 분할에 둘 카메라 종류와 높이. 장소 1~2곳뿐인 종류(AY)는 빼고 train에 둔다.
-    kinds, heights = {"BC", "SC"}, {"1080", "720"}
+    # kinds 밖의 카메라 종류(AY)가 있는 장소는 train에 고정한다.
+    kinds, heights = set(kinds), {str(height) for height in heights}
     fixed = sorted(name for name in stats if stats[name]["kinds"] - kinds)
     names = sorted(name for name in stats if name not in fixed)
     rng = random.Random(seed)
 
     def evaluate(assign):
-        groups = [list(fixed) if i == 0 else [] for i in range(len(SPLITS))]
+        groups = [list(fixed) if i == 0 else [] for i in range(split_count)]
         for name, index in assign.items():
             groups[index].append(name)
         return score(stats, groups, targets, kinds, heights, min_locations, min_person_images), groups
@@ -73,13 +73,13 @@ def propose(stats, ratios, seed, trials, min_locations, min_person_images):
     best = None
     for _ in tqdm(range(trials), desc="분할 탐색", unit="회"):
         # 무작위로 시작한 뒤 장소 이동과 맞교환으로 점수를 낮춘다.
-        assign = {name: rng.choices(range(len(SPLITS)), weights=ratios)[0] for name in names}
+        assign = {name: rng.choices(range(split_count), weights=ratios)[0] for name in names}
         current, _ = evaluate(assign)
         improved = True
         while improved:
             improved = False
             for name in names:
-                for index in range(len(SPLITS)):
+                for index in range(split_count):
                     if assign[name] == index:
                         continue
                     old, assign[name] = assign[name], index
@@ -106,57 +106,35 @@ def propose(stats, ratios, seed, trials, min_locations, min_person_images):
     return best[1]
 
 
-def setup_logging(level):
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--manifest", type=Path, default=Path("data/interim/raw-manifests/101/manifest.csv")
-    )
-    parser.add_argument(
-        "--output", type=Path, default=Path("configs/data/aihub101-ped-v2.splits.yaml")
-    )
-    parser.add_argument("--ratios", type=float, nargs=3, default=(0.7, 0.15, 0.15))
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--trials", type=int, default=200)
-    parser.add_argument(
-        "--min-locations", type=int, default=6,
-        help="val, test에 둘 큰 장소의 최소 수",
-    )
-    parser.add_argument(
-        "--min-person-images", type=int, default=500,
-        help="큰 장소로 셀 보행자 이미지 수의 하한",
-    )
-    parser.add_argument("--log-level", default="INFO", choices=("DEBUG", "INFO", "WARNING"))
-    args = parser.parse_args()
-    setup_logging(args.log_level)
+@hydra.main(version_base=None, config_path=CONFIG_PATH, config_name="split_locations")
+def main(cfg):
+    args = to_args(cfg, paths=("manifest", "output"))
+    setup_logging(args.log_level, args.log_levels)
+    # ratios의 키 순서가 분할 순서다. 첫 분할이 train이다.
+    split_names = list(args.ratios)
+    ratios = list(args.ratios.values())
 
     stats = location_stats(args.manifest)
     logger.info("manifest: %s (장소 %d곳)", args.manifest, len(stats))
     groups = propose(
-        stats, args.ratios, args.seed, args.trials, args.min_locations, args.min_person_images
+        stats, ratios, args.seed, args.trials, args.min_locations, args.min_person_images,
+        args.required_kinds, args.required_heights,
     )
     total = sum(item["person_images"] for item in stats.values())
     document = {
         "source_manifest": args.manifest.as_posix(),
         "unit": "location",
-        "ratios": dict(zip(SPLITS, args.ratios)),
+        "ratios": args.ratios,
         "seed": args.seed,
         "min_locations": args.min_locations,
         "min_person_images": args.min_person_images,
-        "splits": dict(zip(SPLITS, groups)),
+        "splits": dict(zip(split_names, groups)),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8") as stream:
         stream.write("# split_locations.py가 만든 안이다. 검토 후 고정한다.\n")
         yaml.safe_dump(document, stream, allow_unicode=True, sort_keys=False)
-    for split, group in zip(SPLITS, groups):
+    for split, group in zip(split_names, groups):
         persons = sum(stats[name]["person_images"] for name in group)
         images = sum(stats[name]["images"] for name in group)
         kinds = sorted(set().union(*(stats[name]["kinds"] for name in group)))

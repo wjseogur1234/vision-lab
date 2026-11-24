@@ -1,0 +1,37 @@
+# python -m data.raw_manifest
+defaults:
+  - common
+  - _self_
+
+raw_dir: data/raw
+output_dir: data/interim/raw-manifests
+# 처리할 데이터셋. 예: dataset=[101]
+dataset: ["095", "101", "110"]
+# 지원하는 데이터셋 번호
+known_datasets: ["095", "101", "110"]
+# 이미지로 읽을 확장자. 소문자로 적는다.
+image_suffixes: [.jpg, .jpeg]
+# 101 Bbox 메타의 time_space 값을 영어로 바꾼다.
+time_of_day:
+  새벽: dawn
+  오전: morning
+  낮: day
+  오후: afternoon
+# manifest.csv의 열 순서
+fields:
+  - source_split
+  - batch
+  - media_type
+  - file_name
+  - label_file
+  - label_image_id
+  - match_status
+  - location
+  - camera
+  - action
+  - video_id
+  - weather
+  - time_of_day
+  - width
+  - height
+  - num_persons

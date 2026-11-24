@@ -161,7 +161,7 @@ docker compose run --rm lab python -m data.split_locations
 |---|---|
 | 클래스 | 보행자 1개. 원본 7번을 COCO 카테고리 `person`으로 바꾼다 |
 | 오토바이(자전거) 6번 | 넣지 않는다 |
-| 보행자가 없는 이미지 | 분할마다 이미지의 10%를 배경 이미지로 넣는다(`--background-ratio` 기본값, 미정) |
+| 보행자가 없는 이미지 | 분할마다 이미지의 10%를 배경 이미지로 넣는다(`background_ratio` 기본값, 미정) |
 | 날씨, 시간대 | 거르지 않는다. `manifest.csv`에 기록만 한다 |
 
 ### 5.3 라벨 변환
@@ -200,12 +200,12 @@ configs/data/
 생성 명령은 다음과 같다.
 
 ```bash
-docker compose run --rm lab python -m data.build_coco [--name N --fraction F --overwrite]
+docker compose run --rm lab python -m data.build_coco [name=N fraction=F overwrite=true]
 ```
 
-- `--name` 기본값은 `aihub101-ped-v1`이다.
-- `--fraction`은 보행자 이미지를 뽑는 비율이다. 기본값은 1.0이다.
-- `--background-ratio`, `--seed` 기본값은 0.1, 0이다.
+- `name` 기본값은 `aihub101-ped-v1`이다.
+- `fraction`은 보행자 이미지를 뽑는 비율이다. 기본값은 1.0이다.
+- `background_ratio`, `seed` 기본값은 0.1, 0이다.
 
 `issues.csv`의 `issue` 값은 다음과 같다.
 

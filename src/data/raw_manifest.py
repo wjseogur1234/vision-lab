@@ -1,25 +1,20 @@
 """AI Hub 원본 파일과 라벨의 대응을 CSV로 기록한다."""
 
-import argparse
 import csv
 import json
 import os
+import sys
 import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import NamedTuple
 
+import hydra
 from PIL import Image
 from tqdm import tqdm
 
-FIELDS = (
-    "source_split", "batch", "media_type", "file_name", "label_file", "label_image_id",
-    "match_status", "location", "camera", "action", "video_id", "weather", "time_of_day",
-    "width", "height", "num_persons",
-)
-TIME_OF_DAY = {"새벽": "dawn", "오전": "morning", "낮": "day", "오후": "afternoon"}
-IMAGE_SUFFIXES = {".jpg", ".jpeg"}
+from data.config import CONFIG_PATH, to_args
 
 
 class Label(NamedTuple):
@@ -46,7 +41,7 @@ def load_json(path):
         return json.load(stream)
 
 
-def bbox_labels(path):
+def bbox_labels(path, time_of_day):
     data = load_json(path)
     meta_by_id = {meta["id"]: meta for meta in data["meta"]}
     counts = Counter()
@@ -64,7 +59,7 @@ def bbox_labels(path):
                 "location": location,
                 "camera": camera,
                 "weather": str(meta.get("weather") or "").strip().lower() or "unknown",
-                "time_of_day": TIME_OF_DAY.get(meta.get("time_space"), "unknown"),
+                "time_of_day": time_of_day.get(meta.get("time_space"), "unknown"),
                 "num_persons": counts[image_id],
             },
         )
@@ -85,7 +80,8 @@ def voc_label(path):
     )
 
 
-def index_dataset(root, dataset):
+def index_dataset(root, dataset, settings):
+    image_suffixes = set(settings.image_suffixes)
     media = defaultdict(list)
     labels = defaultdict(list)
     files = tqdm(source_files(root), desc=f"{dataset} 파일 찾기", unit="개")
@@ -96,9 +92,9 @@ def index_dataset(root, dataset):
             if parts[2] != "교통안전(Bbox)":
                 continue
             if suffix == ".json":
-                for key, label in bbox_labels(path):
+                for key, label in bbox_labels(path, settings.time_of_day):
                     labels[(split, "", *key)].append(label)
-            elif suffix in IMAGE_SUFFIXES:
+            elif suffix in image_suffixes:
                 location, camera = path.parent.parent.name, path.parent.name
                 key = (split, "", location.casefold(), camera.casefold(), path.name.casefold())
                 media[key].append(path)
@@ -116,7 +112,7 @@ def index_dataset(root, dataset):
         else:
             action, video = path.parent.parent.name, path.parent.name
             key = (split, folder.partition("_")[2], action.casefold(), video.casefold(), stem)
-            if folder.startswith("원천데이터") and suffix in IMAGE_SUFFIXES:
+            if folder.startswith("원천데이터") and suffix in image_suffixes:
                 media[key].append(path)
             elif folder.startswith("라벨링데이터") and suffix == ".xml":
                 labels[key].append(voc_label(path))
@@ -125,8 +121,8 @@ def index_dataset(root, dataset):
     return media, labels
 
 
-def manifest_rows(root, dataset):
-    media, labels = index_dataset(root, dataset)
+def manifest_rows(root, dataset, settings):
+    media, labels = index_dataset(root, dataset, settings)
     keys = sorted(media.keys() | labels.keys())
     for key in tqdm(keys, desc=f"{dataset} 매칭·크기 읽기", unit="개"):
         files, annotations = media.get(key, []), labels.get(key, [])
@@ -169,7 +165,7 @@ def standard_row(root, dataset, path, label):
     return row
 
 
-def write_manifest(root, dataset, destination):
+def write_manifest(root, dataset, destination, settings):
     destination.parent.mkdir(parents=True, exist_ok=True)
     rows = Counter()
     with NamedTemporaryFile(
@@ -177,9 +173,9 @@ def write_manifest(root, dataset, destination):
     ) as stream:
         temporary = Path(stream.name)
         try:
-            writer = csv.DictWriter(stream, fieldnames=FIELDS)
+            writer = csv.DictWriter(stream, fieldnames=settings.fields)
             writer.writeheader()
-            for row in manifest_rows(root, dataset):
+            for row in manifest_rows(root, dataset, settings):
                 writer.writerow(row)
                 rows[row["match_status"]] += 1
             stream.close()
@@ -189,21 +185,23 @@ def write_manifest(root, dataset, destination):
     return rows
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--raw-dir", type=Path, default=Path("data/raw"))
-    parser.add_argument("--output-dir", type=Path, default=Path("data/interim/raw-manifests"))
-    parser.add_argument("--dataset", nargs="+", choices=("095", "101", "110"))
-    args = parser.parse_args()
-    for dataset in dict.fromkeys(args.dataset or ("095", "101", "110")):
+@hydra.main(version_base=None, config_path=CONFIG_PATH, config_name="raw_manifest")
+def main(cfg):
+    args = to_args(cfg, paths=("raw_dir", "output_dir"))
+    # CLI의 dataset=[095]는 정수 95로 읽힌다. 세 자리 문자열로 맞춘다.
+    datasets = [str(name).zfill(3) for name in args.dataset]
+    unknown = set(datasets) - set(args.known_datasets)
+    if unknown:
+        sys.exit(f"알 수 없는 dataset: {sorted(unknown)}")
+    for dataset in dict.fromkeys(datasets):
         roots = sorted(path for path in args.raw_dir.glob(f"{dataset}.*") if path.is_dir())
         if len(roots) != 1:
-            parser.error(f"{args.raw_dir}에서 {dataset}.* 폴더를 하나 찾을 수 있어야 합니다.")
+            sys.exit(f"{args.raw_dir}에서 {dataset}.* 폴더를 하나 찾을 수 있어야 합니다.")
         destination = args.output_dir / dataset / "manifest.csv"
         try:
-            rows = write_manifest(roots[0], dataset, destination)
+            rows = write_manifest(roots[0], dataset, destination, args)
         except (OSError, ValueError, KeyError, ET.ParseError) as error:
-            parser.exit(1, f"{dataset}: {error}\n")
+            sys.exit(f"{dataset}: {error}")
         summary = ", ".join(f"{status}={count}" for status, count in sorted(rows.items()))
         print(f"{destination}: {summary}", flush=True)
 
