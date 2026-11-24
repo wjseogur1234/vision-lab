@@ -140,7 +140,7 @@ docker compose run --rm lab python -m data.build_coco --name aihub101-ped-mini -
 
 ```bash
 docker compose run --rm lab libreyolo train --data configs/data/aihub101-ped-mini.yaml \
-  --model yolox-s --epochs 1 --cache false --project data/interim/runs --name smoke-mini
+  --model yolox-s --epochs 1 --cache false --project outputs/runs --name smoke-mini
 ```
 
 `--cache disk`는 쓰지 않는다. 원본이 읽기 전용이라 실패한다.
