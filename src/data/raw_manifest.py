@@ -11,6 +11,7 @@ from tempfile import NamedTemporaryFile
 from typing import NamedTuple
 
 from PIL import Image
+from tqdm import tqdm
 
 FIELDS = (
     "source_split", "batch", "media_type", "file_name", "label_file", "label_image_id",
@@ -87,7 +88,8 @@ def voc_label(path):
 def index_dataset(root, dataset):
     media = defaultdict(list)
     labels = defaultdict(list)
-    for split, path in source_files(root):
+    files = tqdm(source_files(root), desc=f"{dataset} 파일 찾기", unit="개")
+    for split, path in files:
         parts = path.relative_to(root).parts
         suffix = path.suffix.lower()
         if dataset == "101":
@@ -125,7 +127,8 @@ def index_dataset(root, dataset):
 
 def manifest_rows(root, dataset):
     media, labels = index_dataset(root, dataset)
-    for key in sorted(media.keys() | labels.keys()):
+    keys = sorted(media.keys() | labels.keys())
+    for key in tqdm(keys, desc=f"{dataset} 매칭·크기 읽기", unit="개"):
         files, annotations = media.get(key, []), labels.get(key, [])
         base = {
             "source_split": key[0],
