@@ -32,16 +32,4 @@
 - `.env`의 `RAW_DATA_DIR`은 읽기 전용으로 연결된다.
 - 호스트의 NVIDIA GPU를 `lab`에 할당한다.
 
-이미지를 다시 빌드하려면 명령에 `--build`를 추가한다.
-`run --rm`의 셸에서 `exit`를 실행하면 컨테이너가 삭제된다.
-
-컨테이너를 유지하려면 다음 명령을 쓴다.
-
-```bash
-docker compose up -d lab
-docker compose exec lab bash
-docker compose stop lab
-```
-
-`exec` 셸에서 `exit`를 실행해도 컨테이너는 유지된다.
 프로젝트 폴더 밖의 파일은 컨테이너 삭제 시 사라질 수 있다.
