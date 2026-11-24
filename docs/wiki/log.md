@@ -45,3 +45,8 @@
 ## [2026-11-21] lint | manifest 이미지 경로 예시 수정
 - 관련 커밋: `6aa44ac`
 - 갱신: [dataset-split-plan](analyses/dataset-split-plan.md)
+
+## [2026-11-24] query | 원본 manifest 생성 결과
+- 근거: `data/interim/raw-manifests/`의 CSV 3개를 집계했다.
+- 생성: [raw-manifest](analyses/raw-manifest.md)
+- 갱신: [index](index.md), [dataset-split-plan](analyses/dataset-split-plan.md)

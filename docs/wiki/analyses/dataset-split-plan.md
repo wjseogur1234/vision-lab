@@ -3,7 +3,7 @@ type: analysis
 tags: [dataset, split, preprocessing, coco]
 sources: []
 created: 2026-11-16
-updated: 2026-11-21
+updated: 2026-11-24
 ---
 
 # 데이터셋 분할 계획 — AI Hub 101 Bbox와 110
@@ -59,6 +59,8 @@ updated: 2026-11-21
 ## 5. 데이터셋 만들기 (제안)
 
 ### 5.1 입력 파일 찾기
+
+[원본 manifest](raw-manifest.md)에서 실제 파일 대응 결과를 확인한다.
 
 1. 각 분할의 JSON을 읽어 이미지 목록을 만든다.
 2. 분할, 카메라 ID, 파일 이름으로 JPG를 찾는다.

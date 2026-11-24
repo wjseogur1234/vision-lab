@@ -95,3 +95,24 @@ docker exec -it <컨테이너_이름> bash
 
 AI Hub `101.교통문제 해결을 위한 CCTV 교통 데이터(시내도로)`의 `교통안전(Bbox)`를 쓴다.
 데이터는 저장소에 넣지 않는다. AI Hub에서 직접 받아 `data/raw/` 아래에 심볼릭 링크로 연결한다.
+
+### 원본 manifest
+
+데이터셋마다 원본 파일과 라벨의 대응을 CSV로 기록한다.
+
+```bash
+docker compose run --rm lab python -m data.raw_manifest
+docker compose run --rm lab python -m data.raw_manifest --dataset 101
+```
+
+기본 결과 경로는 `data/interim/raw-manifests/<데이터셋 번호>/manifest.csv`다.
+`--output-dir`로 결과 경로를 바꿀 수 있다.
+파일 경로는 각 원본 데이터셋 폴더를 기준으로 기록한다.
+
+- `095`는 MP4와 사고 JSON을 연결한다.
+- `101`은 Bbox JPG와 JSON의 이미지 항목을 연결한다.
+- `110`은 JPG 프레임과 XML을 연결한다.
+- `source_split`에는 AI Hub의 원본 분할을 기록한다.
+- `num_persons`에는 원본 보행자 라벨 수를 기록한다.
+- 라벨이 없거나 보행자 상자 라벨이 없는 데이터셋은 수를 비워 둔다.
+- 짝이 없는 파일과 후보가 여러 개인 파일도 `match_status`에 기록한다.
