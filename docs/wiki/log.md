@@ -2,6 +2,10 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-24] lint | 공식 문서 대조와 미확인 주장 점검
+- 근거: [형식 문서](https://www.libreyolo.com/docs/reference/dataset-formats), [학습 데이터셋 문서](https://www.libreyolo.com/docs/train/datasets), `data/raw/`의 101 JSON과 110 파일.
+- 갱신: [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md), [aihub-101-cctv](entities/aihub-101-cctv.md), [aihub-110-child-zone](entities/aihub-110-child-zone.md)
+
 ## [2026-11-24] lint | 결정 사항과 mini 검증 결과 반영
 - 근거: `configs/data/aihub101-ped-v1.splits.yaml`, `data/processed/aihub101-ped-mini/metadata.yaml`, `data/interim/runs/smoke-mini/`.
 - 결정: 장소 단위 분할, 클래스 `person` 1개, 결과 경로 `data/processed/`.

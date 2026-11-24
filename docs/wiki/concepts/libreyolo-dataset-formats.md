@@ -13,7 +13,16 @@ updated: 2026-11-24
 제공 자료는 `dataset_schema.md`의 v1.6.0을 기준으로 밝힌다.
 프로젝트는 `libreyolo==1.8.0`을 지정한다.
 버전 차이는 실제 설치 환경에서 확인해야 한다.
-1.8.0에서 COCO JSON 검출 학습은 동작을 확인했다(2026-11-24, YOLOX). [분할 계획 8절](../analyses/dataset-split-plan.md#8-mini-검증-결과-2026-11-24)
+1.8.0에서 COCO JSON 검출 학습은 동작을 확인했다(2026-11-24, YOLOX).
+
+> [!note] 갱신됨 (2026-11-24, 공식 문서 대조)
+> 공식 사이트는 1.8.0이 최신이다.
+> 형식 문서는 아직 v1.6.0 `dataset_schema.md`를 따른다고 밝힌다.
+> 1.8.0에서 바뀐 점은 [학습 데이터셋 문서](https://www.libreyolo.com/docs/train/datasets)에 있다.
+> - 상대 `path`는 YAML 폴더 기준으로 찾는다. 없으면 `~/datasets` 아래를 찾는다.
+> - `channels` 키는 1.8.0에서 추가됐다.
+> - COCO 분할 경로는 이미지 폴더 1개여야 한다. 목록이나 `.txt`는 오류가 난다.
+> - 캐시 옵션(`--cache`)은 두 문서에 설명이 없다. [분할 계획 8절](../analyses/dataset-split-plan.md#8-mini-검증-결과-2026-11-24)
 각 형식의 존재가 모든 모델의 학습 지원을 뜻하지는 않는다.
 [모델별 검출 데이터 형식](../analyses/libreyolo-models.md#모델별-검출-데이터-형식)을 함께 확인한다.
 
@@ -27,7 +36,7 @@ updated: 2026-11-24
 | `train` | 학습 시 필요 | 학습 이미지 경로 |
 | `val` | 검증 시 필요 | 검증 이미지 경로 |
 | `test` | 선택 | 테스트 이미지 경로 |
-| `names` | 필요 | 클래스 목록 또는 정수 키 매핑 |
+| `names` | 필요 | 클래스 목록 또는 정수 키 매핑. COCO에서는 생략할 수 있다(아래 모순 참고) |
 | `nc` | 선택 | 클래스 수. `names`와 일치해야 한다 |
 | `download` | 선택 | 다운로드 지침. Python 스크립트는 명시적 허용이 필요하다 |
 | `annotations` | 선택 | 분할별 COCO JSON. 검출, 인스턴스 분할, OBB에 사용한다 |
@@ -58,6 +67,14 @@ names:
 `names`가 있으면 COCO의 클래스 이름과 일치해야 한다.
 `names`가 모델의 클래스 ID를 결정한다.
 `names`가 없으면 COCO ID를 정렬해 0부터 연속된 ID로 바꾼다.
+> [!warning] 모순 — `names` 필요 여부
+> [형식 문서](https://www.libreyolo.com/docs/reference/dataset-formats)는 `names`를 필수로 적는다.
+> [학습 데이터셋 문서](https://www.libreyolo.com/docs/train/datasets)는 `names`가 없어도 점검 경고만 낸다고 적는다.
+> 이 프로젝트는 `names`를 항상 적는다.
+
+`annotations` 경로가 `path` 기준인지는 문서에 명시돼 있지 않다.
+이 프로젝트에서는 `path` 기준으로 동작했다(1.8.0).
+
 데이터셋 YAML에는 `task` 키를 넣지 않는다.
 명시적으로 선택한 모델과 작업이 우선한다.
 
@@ -83,6 +100,8 @@ names:
 
 한 줄에 필드 5개를 쓴다.
 중심점과 크기는 축에 평행한 박스를 나타낸다.
+학습 데이터셋 문서는 필드가 5개보다 많은 줄을 다각형으로 읽는다고 적는다. 박스는 다각형의 범위가 된다.
+경계를 넘는 박스는 학습과 검증에서 잘라 낸다. 면적이 없는 박스는 버린다.
 `w`와 `h`는 양수다.
 이 프로젝트의 변환 계획은 [분할 계획 5.3절](../analyses/dataset-split-plan.md#53-라벨-변환)에 있다.
 
