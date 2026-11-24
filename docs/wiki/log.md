@@ -2,6 +2,11 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-24] query | LibreYOLO MLflow 지원 여부
+- 근거: 설치된 `libreyolo==1.8.0` 코드, [Experiment loggers](https://www.libreyolo.com/docs/train/loggers).
+- 생성: [libreyolo-mlflow](analyses/libreyolo-mlflow.md)
+- 갱신: [libreyolo-model-reference](sources/libreyolo-model-reference.md), [libreyolo-models](analyses/libreyolo-models.md), [index](index.md)
+
 ## [2026-11-24] lint | 공식 문서 대조와 미확인 주장 점검
 - 근거: [형식 문서](https://www.libreyolo.com/docs/reference/dataset-formats), [학습 데이터셋 문서](https://www.libreyolo.com/docs/train/datasets), `data/raw/`의 101 JSON과 110 파일.
 - 갱신: [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md), [aihub-101-cctv](entities/aihub-101-cctv.md), [aihub-110-child-zone](entities/aihub-110-child-zone.md)

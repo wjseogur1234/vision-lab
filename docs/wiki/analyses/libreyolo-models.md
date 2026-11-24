@@ -21,6 +21,7 @@ updated: 2026-11-24
 - 가중치는 프로젝트 루트의 `weights/`에 내려받는다.
 - YOLOX-s(`yolox-s`)로 COCO JSON 학습 1 epoch를 확인했다(2026-11-24). 결과는 [분할 계획 8.2절](dataset-split-plan.md#82-학습-확인)에 있다.
 - 다른 모델의 로딩과 학습은 실행하지 않았다.
+- 실험 기록 도구 연동은 [libreyolo-mlflow](libreyolo-mlflow.md)에 있다.
 
 ## 보행자 박스 검출 후보
 
