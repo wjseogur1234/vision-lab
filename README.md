@@ -7,8 +7,8 @@
 
 | 단계 | 내용 | 코드 위치 | 상태 |
 |---|---|---|---|
-| 준비 | 프로젝트 구성, 라이브러리 환경 | `pyproject.toml` | 진행 중 |
-| Phase 0 | 데이터셋 구조, 데이터셋 불러오기 | `src/data/` | 예정 |
+| 준비 | 프로젝트 구성, 라이브러리 환경 | `pyproject.toml` | 완료 |
+| Phase 0 | 데이터셋 구조, 데이터셋 불러오기 | `src/data/` | 진행 중 |
 
 ## 폴더
 
@@ -18,13 +18,14 @@
 ├── Dockerfile            # 실행 환경 이미지 (전처리, 학습)
 ├── compose.yaml          # 컨테이너 실행 설정 (마운트, GPU)
 ├── configs/
-│   └── data/             # 데이터셋 YAML (LibreYOLO에 넘기는 파일)
+│   └── data/             # 분할 목록(*.splits.yaml)과 생성된 데이터셋 YAML (생성 YAML은 git 제외)
 ├── src/
 │   └── data/             # Phase 0 코드 (데이터셋 변환, 불러오기)
 └── data/
     ├── raw/              # 원본으로 가는 심볼릭 링크 (git 제외)
     ├── interim/          # 전처리 중간 파일. 지워도 된다 (git 제외)
-    └── processed/        # 변환 결과로 가는 심볼릭 링크 (git 제외)
+    └── processed/        # 변환 결과. COCO JSON과 manifest (git 제외)
+weights/                  # 내려받은 가중치 (git 제외)
 ```
 
 LibreYOLO는 고치지 않고 라이브러리로만 쓴다. 이 저장소에는 데이터 변환, 설정, 호출 코드만 둔다.
@@ -87,13 +88,18 @@ docker exec -it <컨테이너_이름> bash
 | 프로젝트 폴더 (`/app`, `data/` 포함) | 쓰기 가능 |
 | 원본 데이터 (`RAW_DATA_DIR`) | 읽기 전용 |
 
+컨테이너는 `lab` 계정으로 실행한다.
+UID와 GID는 기본 1000이다. 호스트 사용자와 같아야 결과 파일이 root 소유가 되지 않는다.
+호스트 UID가 다르면 `.env`에 `UID`, `GID`를 적고 다시 빌드한다.
+
 원본 데이터는 호스트와 같은 경로에 마운트한다.
 그래서 `data/raw/`의 심볼릭 링크가 컨테이너 안에서도 맞는다.
 마운트 설정을 바꾼 뒤에는 컨테이너를 다시 만들어야 한다.
 
 ## 데이터
 
-AI Hub `101.교통문제 해결을 위한 CCTV 교통 데이터(시내도로)`의 `교통안전(Bbox)`를 쓴다.
+AI Hub `101.교통문제 해결을 위한 CCTV 교통 데이터(시내도로)`의 `교통안전(Bbox)`를 주로 쓴다.
+`095`, `110`도 `data/raw/`에 연결한다. 쓰임은 `docs/wiki/`에 있다.
 데이터는 저장소에 넣지 않는다. AI Hub에서 직접 받아 `data/raw/` 아래에 심볼릭 링크로 연결한다.
 
 ### 원본 manifest
@@ -116,3 +122,25 @@ docker compose run --rm lab python -m data.raw_manifest --dataset 101
 - `num_persons`에는 원본 보행자 라벨 수를 기록한다.
 - 라벨이 없거나 보행자 상자 라벨이 없는 데이터셋은 수를 비워 둔다.
 - 짝이 없는 파일과 후보가 여러 개인 파일도 `match_status`에 기록한다.
+
+### 학습 데이터셋 만들기
+
+```bash
+docker compose run --rm lab python -m data.split_locations
+docker compose run --rm lab python -m data.build_coco
+docker compose run --rm lab python -m data.build_coco --name aihub101-ped-mini --fraction 0.065
+```
+
+- `split_locations`는 장소 단위 분할 안을 `configs/data/aihub101-ped-v1.splits.yaml`에 쓴다.
+- `build_coco`는 `data/processed/<이름>/`에 COCO JSON과 manifest를 쓴다.
+- `build_coco`는 LibreYOLO YAML을 `configs/data/<이름>.yaml`에 쓴다.
+- 이미지는 복사하지 않는다. COCO `file_name`은 `data/raw/` 기준 원본 경로다.
+
+### 학습
+
+```bash
+docker compose run --rm lab libreyolo train --data configs/data/aihub101-ped-mini.yaml \
+  --model yolox-s --epochs 1 --cache false --project data/interim/runs --name smoke-mini
+```
+
+`--cache disk`는 쓰지 않는다. 원본이 읽기 전용이라 실패한다.
