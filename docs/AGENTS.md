@@ -4,6 +4,21 @@
 RAG처럼 질문할 때마다 원자료를 다시 찾는 대신, LLM이 원자료를 읽고 위키에 **누적·통합**한다.
 사람은 자료 수집·방향 제시·질문을 맡고, 요약·교차참조·정리·장부 관리는 전부 LLM이 맡는다.
 
+## index.md / log.md
+
+- `index.md`: 주제별 대분류(기획 / 데이터 / 모델 / 자료) → 중분류 → 페이지 목록. "목차 구성 지침"을 따른다.
+  각 줄: `- [slug](분류/slug.md) — 한 줄 요약`. 모든 ingest마다 갱신.
+- `log.md`: 새 기록은 기존 첫 항목 위에 추가한다.
+  모든 항목은 다음 형식으로 시작한다.
+
+```
+## [YYYY-MM-DD] ingest | 소스 제목
+- 생성: [a](entities/a.md), [b](sources/b.md)
+- 갱신: [c](analyses/c.md), [overview](overview.md)
+```
+  작업 종류: `ingest` / `query` / `lint` / `schema`.
+  최근 기록 확인: `grep "^## \[" wiki/log.md | head -5`
+
 ## 목차 구성 지침
 
 목차(`wiki/index.md`)는 LLM이 페이지를 찾는 입구다. 목차가 커질 때 성능을 떨어뜨리는 원인은 개수 자체보다 **평면 나열, 의미 중복, 서술형 이름**이다. 항목 수는 **200개를 넘지 않게** 유지하되, 아래 규칙을 함께 지킨다.
@@ -120,18 +135,3 @@ updated: YYYY-MM-DD
 - 빠진 교차참조
 - 해결된 "미정" 항목, 결정이 바뀐 뒤 남은 옛 표현, 틀린 절 번호
 - 웹 검색으로 채울 수 있는 데이터 공백, 다음에 조사할 질문/찾을 소스 제안
-
-## index.md / log.md
-
-- `index.md`: 주제별 대분류(기획 / 데이터 / 모델 / 자료) → 중분류 → 페이지 목록. "목차 구성 지침"을 따른다.
-  각 줄: `- [slug](분류/slug.md) — 한 줄 요약`. 모든 ingest마다 갱신.
-- `log.md`: 새 기록은 기존 첫 항목 위에 추가한다.
-  모든 항목은 다음 형식으로 시작한다.
-
-```
-## [YYYY-MM-DD] ingest | 소스 제목
-- 생성: [a](entities/a.md), [b](sources/b.md)
-- 갱신: [c](analyses/c.md), [overview](overview.md)
-```
-  작업 종류: `ingest` / `query` / `lint` / `schema`.
-  최근 기록 확인: `grep "^## \[" wiki/log.md | head -5`
