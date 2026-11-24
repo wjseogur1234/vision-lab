@@ -22,6 +22,9 @@
 ### 객체 검출
 - [libreyolo-models](analyses/libreyolo-models.md) — 보행자 검출 후보, 설치 조건, 실행 환경, 검증 범위
 
+### 실험 관리
+- [libreyolo-mlflow](analyses/libreyolo-mlflow.md) — MLflow 지원 여부, MLflowLogger 사용법, 기록 항목, 도입 할 일 (규격 미정)
+
 ## 자료 — 원자료 요약 (sources)
 ### 공식 문서
 - [libreyolo-model-reference](sources/libreyolo-model-reference.md) — LibreYOLO 모델 목록과 PyPI 배포 정보
