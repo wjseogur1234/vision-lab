@@ -2,6 +2,11 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-24] lint | 문서 전체 일치 점검
+- 수정: README 폴더 구조에 `docs/`, `outputs/`를 넣고 `weights/` 위치를 바로잡았다.
+- 추가: AGENTS.md와 분할 계획 7절에 학습 결과 경로 `outputs/`.
+- 갱신: [dataset-split-plan](analyses/dataset-split-plan.md)
+
 ## [2026-11-24] lint | 진행 상황 갱신
 - 수정: 학습 결과 경로 `data/interim/runs` → `outputs/runs`.
 - 갱신: [overview](overview.md), [dataset-split-plan](analyses/dataset-split-plan.md)

@@ -17,15 +17,17 @@
 ├── pyproject.toml        # 의존성. LibreYOLO(PyPI)와 torch CUDA 빌드를 지정한다
 ├── Dockerfile            # 실행 환경 이미지 (전처리, 학습)
 ├── compose.yaml          # 컨테이너 실행 설정 (마운트, GPU)
+├── docs/                 # LLM Wiki. 규칙은 docs/AGENTS.md
 ├── configs/
 │   └── data/             # 분할 목록(*.splits.yaml)과 생성된 데이터셋 YAML (생성 YAML은 git 제외)
 ├── src/
 │   └── data/             # Phase 0 코드 (데이터셋 변환, 불러오기)
-└── data/
-    ├── raw/              # 원본으로 가는 심볼릭 링크 (git 제외)
-    ├── interim/          # 전처리 중간 파일. 지워도 된다 (git 제외)
-    └── processed/        # 변환 결과. COCO JSON과 manifest (git 제외)
-weights/                  # 내려받은 가중치 (git 제외)
+├── data/
+│   ├── raw/              # 원본으로 가는 심볼릭 링크 (git 제외)
+│   ├── interim/          # 전처리 중간 파일. 지워도 된다 (git 제외)
+│   └── processed/        # 변환 결과. COCO JSON과 manifest (git 제외)
+├── outputs/              # 학습 결과. MLflow 규격을 정할 때까지 임시로 쓴다 (git 제외)
+└── weights/              # 내려받은 가중치 (git 제외)
 ```
 
 LibreYOLO는 고치지 않고 라이브러리로만 쓴다. 이 저장소에는 데이터 변환, 설정, 호출 코드만 둔다.

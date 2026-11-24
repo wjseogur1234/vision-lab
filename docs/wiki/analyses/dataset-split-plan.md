@@ -231,6 +231,7 @@ docker compose run --rm lab python -m data.build_coco [--name N --fraction F --o
 - [x] 분할 방법: 장소 단위(C)로 정했다.
 - [x] 클래스: 보행자 1개(`person`)로 정했다.
 - [x] 저장 경로: 결과는 `data/processed/`, 임시 파일은 `data/interim/`에 둔다. 이미지는 복사하지 않는다.
+  - 학습 결과는 임시로 `outputs/runs/`에 둔다.
 - [ ] 장소 배정 안(4.1절) 검토와 고정.
 - [ ] 배경 이미지의 비율. 현재 기본값은 10%다.
 - [ ] 같은 카메라의 프레임 수에 상한을 둘지. 카메라마다 1장~7,064장으로 차이가 크다. 현재 상한은 없다.
