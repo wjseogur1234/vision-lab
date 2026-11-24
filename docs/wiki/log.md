@@ -2,6 +2,12 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-24] lint | 결정 사항과 mini 검증 결과 반영
+- 근거: `configs/data/aihub101-ped-v1.splits.yaml`, `data/processed/aihub101-ped-mini/metadata.yaml`, `data/interim/runs/smoke-mini/`.
+- 결정: 장소 단위 분할, 클래스 `person` 1개, 결과 경로 `data/processed/`.
+- 수정: 해결된 미정 항목, 낡은 "학습 실행 안 함" 표현, `raw-manifest` frontmatter의 `sources` 형식.
+- 갱신: [dataset-split-plan](analyses/dataset-split-plan.md), [libreyolo-models](analyses/libreyolo-models.md), [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md), [raw-manifest](analyses/raw-manifest.md), [aihub-101-cctv](entities/aihub-101-cctv.md), [aihub-110-child-zone](entities/aihub-110-child-zone.md), [overview](overview.md), [index](index.md)
+
 ## [2026-11-24] lint | 이미지 복사 없이 원본 경로 사용
 - 근거: LibreYOLO는 YAML 루트와 COCO `file_name`을 이어서 이미지를 읽는다.
 - 갱신: [dataset-split-plan](analyses/dataset-split-plan.md)

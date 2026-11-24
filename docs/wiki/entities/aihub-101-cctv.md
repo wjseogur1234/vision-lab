@@ -3,7 +3,7 @@ type: entity
 tags: [dataset, aihub, cctv, bbox, tracking, segmentation]
 sources: []
 created: 2026-11-16
-updated: 2026-11-20
+updated: 2026-11-24
 ---
 
 # AI Hub 101 — 교통문제 해결을 위한 CCTV 교통 데이터(시내도로)
@@ -44,6 +44,7 @@ Validation Tracking 라벨은 장소 폴더 없이 카메라 폴더에 있다.
 | Segmantation | 24,691 / 61 | 1,028 / 39 |
 
 Training Tracking JPG 수는 추가분 31,200장을 포함한다.
+Bbox의 JPG와 라벨 대응은 [원본 manifest](../analyses/raw-manifest.md#2026-11-24-생성-결과)에 있다. 163,901장이 1대1로 연결됐다.
 
 ## 3. 교통안전(Bbox)
 

@@ -15,12 +15,12 @@
 
 ### 전처리
 - [raw-manifest](analyses/raw-manifest.md) — 원본 CSV 열, 파일 대응 결과, 누락 확인 방법
-- [dataset-split-plan](analyses/dataset-split-plan.md) — 분할 계획. 장소 단위 분할, 입력 파일 대응, COCO JSON 결과 구조 (제안, 미결정)
+- [dataset-split-plan](analyses/dataset-split-plan.md) — 분할 계획. 장소 단위 분할, COCO JSON 결과 구조, mini 검증 결과 (일부 미정)
 - [libreyolo-dataset-formats](concepts/libreyolo-dataset-formats.md) — 작업별 라벨, YAML, 파일 구조
 
 ## 모델 — 학습, 추론·API, 평가
 ### 객체 검출
-- [libreyolo-models](analyses/libreyolo-models.md) — 보행자 검출 후보, 설치 조건, 검증 범위
+- [libreyolo-models](analyses/libreyolo-models.md) — 보행자 검출 후보, 설치 조건, 실행 환경, 검증 범위
 
 ## 자료 — 원자료 요약 (sources)
 ### 공식 문서

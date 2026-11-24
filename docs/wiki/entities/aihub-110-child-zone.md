@@ -3,7 +3,7 @@ type: entity
 tags: [dataset, aihub, cctv, bbox, video]
 sources: []
 created: 2026-11-16
-updated: 2026-11-20
+updated: 2026-11-24
 ---
 
 # AI Hub 110 — 어린이 보호구역 내 어린이 도로보행 위험행동 영상 데이터
@@ -42,7 +42,7 @@ CCTV로 찍은 위험행동 영상이다. 프레임마다 사람 상자가 있�
 - XML과 JPG는 행동 묶음과 영상 이름 아래에 있다.
 - MP4는 `clip/` 아래의 행동 묶음에 있다.
 - 대응을 찾을 때 이름의 대소문자 차이를 확인한다.
-- 프레임별 대응 수는 추가 확인이 필요하다.
+- 프레임별 대응 수는 [원본 manifest](../analyses/raw-manifest.md#2026-11-24-생성-결과)에 있다. JPG 114,901개 중 84,600개가 XML과 연결됐다.
 
 ## 4. 이전 조사 기록
 

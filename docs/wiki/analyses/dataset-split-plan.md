@@ -1,17 +1,20 @@
 ---
 type: analysis
 tags: [dataset, split, preprocessing, coco]
-sources: []
+sources: ["wiki/analyses/raw-manifest.md", "wiki/entities/aihub-101-cctv.md"]
 created: 2026-11-16
 updated: 2026-11-24
 ---
 
 # 데이터셋 분할 계획 — AI Hub 101 Bbox와 110
 
-보행자 검출용 데이터셋을 어떻게 나누고 만들지에 대한 제안이다.
+보행자 검출용 데이터셋을 나누고 만드는 계획이다.
 
-> [!note] 상태
-> 제안이다. 7절의 항목은 아직 결정하지 않았다.
+> [!note] 상태 (2026-11-24)
+> 분할 방법, 클래스, 라벨 형식, 저장 경로는 결정했다.
+> 장소 목록(4.1절)은 검토 전이다.
+> 배경 비율과 카메라별 상한은 미정이다(7절).
+> mini 데이터셋으로 생성과 학습을 확인했다(8절).
 
 ## 1. 쓰는 데이터
 
@@ -38,12 +41,12 @@ updated: 2026-11-24
 | C. 장소 단위 | 장소 이름 | 새 장소 | 장소가 37곳뿐이라 비율을 정확히 맞추기 어렵다 |
 | D. 날짜 단위 | 촬영 날짜 | 같은 카메라의 다른 날 | 배경이 겹친다 |
 
-**제안: C. 장소 단위.**
+**결정: C. 장소 단위.**
 
 - 이 프로젝트의 목적은 처음 보는 CCTV에서도 보행자를 찾는 것이다. C가 이 목적에 가장 가깝다.
 - 같은 영상에서 뽑은 비슷한 프레임도 한쪽에만 들어간다.
 
-## 4. 분할 절차 (제안)
+## 4. 분할 절차
 
 1. Training과 Validation의 라벨을 합친다. 합계는 이미지 163,913장, 장소 37곳, 카메라 70대다(라벨 기준).
 2. 장소마다 보행자가 있는 이미지 수를 센다.
@@ -51,12 +54,32 @@ updated: 2026-11-24
 4. 배정할 때 다음을 맞춘다.
    - 세 묶음 모두에 `BC` 카메라와 `SC` 카메라가 들어간다.
    - 세 묶음 모두에 1920x1080과 1280x720 이미지가 들어간다.
-5. 배정 결과를 `configs/data/`의 파일에 적는다. 이 파일을 git에 올린다.
+5. 배정 결과를 `configs/data/aihub101-ped-v1.splits.yaml`에 적는다. 이 파일을 git에 올린다.
 6. test는 Phase 3의 최종 평가에만 쓴다. 학습 중 모델 선택에는 val만 쓴다.
 
-난수로 배정하지 않고 목록을 파일로 고정한다. 다시 실행해도 같은 결과가 나온다.
+배정은 시드를 고정한 무작위 탐색으로 만든다.
+결과 목록은 파일로 고정한다. 다시 실행해도 같은 결과가 나온다.
 
-## 5. 데이터셋 만들기 (제안)
+```bash
+docker compose run --rm lab python -m data.split_locations
+```
+
+### 4.1 배정 안 (검토 전)
+
+기준: [원본 manifest](raw-manifest.md)의 `matched` 행. 생성일 2026-11-24, 시드 0.
+
+| 분할 | 장소 | 카메라 | 이미지 | 보행자가 있는 이미지 | 비율 |
+|---|---:|---:|---:|---:|---:|
+| train | 27곳 | 47대 | 106,797장 | 54,293장 | 70.0% |
+| val | 4곳 | 11대 | 26,038장 | 11,650장 | 15.0% |
+| test | 6곳 | 12대 | 31,066장 | 11,619장 | 15.0% |
+| 합계 | 37곳 | 70대 | 163,901장 | 77,562장 | 100% |
+
+- 세 분할 모두에 `BC`, `SC` 카메라가 있다.
+- 세 분할 모두에 1080과 720 높이 이미지가 있다.
+- 장소 이름 목록은 분할 파일에 있다.
+
+## 5. 데이터셋 만들기
 
 ### 5.1 입력 파일 찾기
 
@@ -75,7 +98,7 @@ updated: 2026-11-24
 |---|---|
 | 클래스 | 보행자 1개. 원본 7번을 COCO 카테고리 `person`으로 바꾼다 |
 | 오토바이(자전거) 6번 | 넣지 않는다 |
-| 보행자가 없는 이미지 | 전체의 10% 정도를 배경 이미지로 넣는다 |
+| 보행자가 없는 이미지 | 분할마다 이미지의 10%를 배경 이미지로 넣는다(`--background-ratio` 기본값, 미정) |
 | 날씨, 시간대 | 거르지 않는다. `manifest.csv`에 기록만 한다 |
 
 ### 5.3 라벨 변환
@@ -100,16 +123,37 @@ LibreYOLO 규격은 [데이터셋 형식](../concepts/libreyolo-dataset-formats.
 ### 5.4 결과 구조
 
 ```text
-<전처리 결과 경로>/aihub101-ped-v1/
+data/processed/aihub101-ped-v1/
 ├── annotations/{train,val,test}.json
-└── manifest.csv
+├── manifest.csv     이미지 1장이 1행
+├── issues.csv       버린 항목과 이유
+└── metadata.yaml    생성 명령, 인수, 분할별 수
 
 configs/data/
-├── aihub101-ped-v1.yaml          LibreYOLO에 넘기는 데이터셋 YAML (`annotations` 키 포함)
-└── aihub101-ped-v1.splits.yaml   장소별 분할 목록
+├── aihub101-ped-v1.yaml          LibreYOLO에 넘기는 데이터셋 YAML. 생성 파일이라 git에서 제외한다
+└── aihub101-ped-v1.splits.yaml   장소별 분할 목록. git에 올린다
 ```
 
+생성 명령은 다음과 같다.
+
+```bash
+docker compose run --rm lab python -m data.build_coco [--name N --fraction F --overwrite]
+```
+
+- `--name` 기본값은 `aihub101-ped-v1`이다.
+- `--fraction`은 보행자 이미지를 뽑는 비율이다. 기본값은 1.0이다.
+- `--background-ratio`, `--seed` 기본값은 0.1, 0이다.
+
+`issues.csv`의 `issue` 값은 다음과 같다.
+
+| 값 | 의미 |
+|---|---|
+| `ambiguous` | 원본 manifest에서 후보가 여러 개인 항목. 넣지 않는다 |
+| `missing_media` | 라벨에 대응하는 JPG가 없는 항목. 넣지 않는다 |
+| `empty_box` | 잘라 낸 뒤 `w` 또는 `h`가 0 이하인 상자. 버린다 |
+
 - 이미지는 복사하지 않는다. 원본 경로가 이미 겹치지 않는다.
+- YAML의 `path`는 `/app/data/processed/<이름>`이다. `annotations`는 `path` 기준 경로다.
 - YAML의 `train`, `val`, `test`는 모두 `/app/data/raw`로 적는다.
 - LibreYOLO는 이 루트와 `file_name`을 이어서 이미지를 읽는다.
 - 저장 위치가 바뀌면 `data/raw/` 링크만 고친다.
@@ -123,14 +167,17 @@ configs/data/
 | 열 | 내용 | 값 예 |
 |---|---|---|
 | `file_name` | `data/raw/` 기준 원본 경로 | `101.교통문제_.../01.데이터/.../xxx.jpg` |
+| `split` | 분할 | `train`, `val`, `test` |
 | `location` | 장소 | 원본의 장소 이름 |
 | `camera` | 카메라 ID | `BC01` |
 | `weather` | 날씨 | `sunny`, `rainy`, `cloudy`, `foggy`, `snow` |
 | `time_of_day` | 시간대 | `dawn`, `morning`, `day`, `afternoon` |
 | `width` | 이미지 너비 (픽셀) | `1920`, `1280` |
 | `height` | 이미지 높이 (픽셀) | `1080`, `720` |
-| `split` | 분할 | `train`, `val`, `test` |
 | `num_persons` | 보행자 상자 수 | `3` |
+| `source_split` | AI Hub 원본 분할 | `1.Training` |
+| `label_file` | 101 폴더 기준 라벨 JSON 경로 | `01.데이터/.../xxx.json` |
+| `label_image_id` | 라벨 JSON의 `images[].id` | `368617` |
 
 값 규칙은 다음과 같다. 코드로 바로 거르고 셀 수 있게 한다.
 
@@ -158,8 +205,8 @@ configs/data/
 
 ### 5.5 진행 순서
 
-1. 작은 데이터셋(`mini`, 약 5,000장)을 먼저 만든다. 변환 코드와 불러오기를 빨리 확인한다.
-2. 확인이 끝나면 전체(`v1`)를 만든다.
+1. 작은 데이터셋(`mini`, 약 5,000장)을 먼저 만든다. 변환 코드와 불러오기를 빨리 확인한다. (완료, 8절)
+2. 확인이 끝나면 전체(`v1`)를 만든다. (예정)
 
 ## 6. AI Hub 110 사용 계획
 
@@ -181,13 +228,58 @@ configs/data/
 
 ## 7. 정해야 할 것
 
-- [ ] 분할 방법: 장소 단위(C)로 할지, 공식 구분(A)으로 할지.
-- [ ] 클래스: 보행자 1개로 할지, 7개를 모두 쓸지.
-- [ ] 전처리 결과와 임시 파일의 저장 경로. `/mnt/data1`의 남은 공간은 5.0TB다(2026-11-16 기준).
-- [ ] 배경 이미지의 비율.
-- [ ] 같은 카메라의 프레임 수에 상한을 둘지. 카메라마다 1장~7,064장으로 차이가 크다.
+- [x] 분할 방법: 장소 단위(C)로 정했다.
+- [x] 클래스: 보행자 1개(`person`)로 정했다.
+- [x] 저장 경로: 결과는 `data/processed/`, 임시 파일은 `data/interim/`에 둔다. 이미지는 복사하지 않는다.
+- [ ] 장소 배정 안(4.1절) 검토와 고정.
+- [ ] 배경 이미지의 비율. 현재 기본값은 10%다.
+- [ ] 같은 카메라의 프레임 수에 상한을 둘지. 카메라마다 1장~7,064장으로 차이가 크다. 현재 상한은 없다.
 
-## 8. 확인하지 않은 것
+## 8. mini 검증 결과 (2026-11-24)
 
-- 라벨과 실제 JPG의 파일별 대응.
-- 장소별 이미지 수. 4절의 2단계에서 센다.
+### 8.1 생성
+
+명령: `build_coco --name aihub101-ped-mini --fraction 0.065 --overwrite`
+
+| 분할 | 이미지 | 배경 이미지 | 보행자 상자 |
+|---|---:|---:|---:|
+| train | 3,921장 | 392장 | 13,426개 |
+| val | 841장 | 84장 | 2,241개 |
+| test | 839장 | 84장 | 2,405개 |
+
+`issues.csv` 기록: `ambiguous` 12, `missing_media` 4, `empty_box` 7.
+
+### 8.2 학습 확인
+
+LibreYOLO 1.8.0으로 1 epoch를 학습했다.
+
+```bash
+docker compose run --rm lab libreyolo train --data configs/data/aihub101-ped-mini.yaml \
+  --model yolox-s --epochs 1 --cache false \
+  --project data/interim/runs --name smoke-mini
+```
+
+| 항목 | 값 |
+|---|---|
+| 모델 | `yolox-s`, 입력 640, batch 16 |
+| 학습 시간 | 약 72초/epoch (약 54장/초) |
+| val mAP50 | 0.445 |
+| val mAP50-95 | 0.212 |
+| val mAP_small | 0.029 |
+
+- 이 수치는 동작 확인용이다. 성능 비교에 쓰지 않는다.
+- 작은 보행자의 mAP가 낮다. [aihub-101-cctv 3.5절](../entities/aihub-101-cctv.md#35-보행자-상자의-크기)의 상자 크기와 맞는다.
+
+### 8.3 주의할 점
+
+- `--cache disk`를 쓰지 않는다. 이미지 옆에 `.npy`를 쓰려다 실패한다. 원본은 읽기 전용이다.
+- 가중치는 프로젝트 루트의 `weights/`에 내려받는다. git에서 제외한다.
+- 다음 경고는 무시한다.
+  - `No images found for split ... at /app/data/raw`. COCO 경로로 이미지를 읽으므로 학습에 문제가 없다.
+  - 로그 경로에 `//`가 보이는 표시.
+  - `faster_coco_eval`이 없다는 경고.
+
+## 9. 확인하지 않은 것
+
+- 전체 v1을 HDD에서 읽을 때의 학습 속도.
+- 110 데이터의 COCO 변환.

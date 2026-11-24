@@ -3,7 +3,7 @@ type: concept
 tags: [libreyolo, dataset, annotation]
 sources: ["wiki/sources/libreyolo-model-reference.md"]
 created: 2026-11-21
-updated: 2026-11-21
+updated: 2026-11-24
 ---
 
 # LibreYOLO 데이터셋 형식
@@ -13,6 +13,7 @@ updated: 2026-11-21
 제공 자료는 `dataset_schema.md`의 v1.6.0을 기준으로 밝힌다.
 프로젝트는 `libreyolo==1.8.0`을 지정한다.
 버전 차이는 실제 설치 환경에서 확인해야 한다.
+1.8.0에서 COCO JSON 검출 학습은 동작을 확인했다(2026-11-24, YOLOX). [분할 계획 8절](../analyses/dataset-split-plan.md#8-mini-검증-결과-2026-11-24)
 각 형식의 존재가 모든 모델의 학습 지원을 뜻하지는 않는다.
 [모델별 검출 데이터 형식](../analyses/libreyolo-models.md#모델별-검출-데이터-형식)을 함께 확인한다.
 

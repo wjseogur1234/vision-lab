@@ -3,7 +3,7 @@ type: analysis
 tags: [libreyolo, object-detection]
 sources: ["wiki/sources/libreyolo-model-reference.md"]
 created: 2026-11-19
-updated: 2026-11-21
+updated: 2026-11-24
 ---
 
 # LibreYOLO 모델
@@ -17,7 +17,10 @@ updated: 2026-11-21
 - 확인일 기준 PyPI 최신 버전은 1.8.0이다. [libreyolo-model-reference](../sources/libreyolo-model-reference.md)
 - 의존성은 프로젝트의 `uv.lock`에 잠겨 있다.
 - Docker의 `lab` 서비스에서 학습 환경을 실행한다.
-- 모델 로딩과 학습은 실행하지 않았다.
+- `lab`은 호스트와 같은 UID(기본 1000)의 `lab` 계정으로 실행한다. 결과 파일이 root 소유가 되지 않는다.
+- 가중치는 프로젝트 루트의 `weights/`에 내려받는다.
+- YOLOX-s(`yolox-s`)로 COCO JSON 학습 1 epoch를 확인했다(2026-11-24). 결과는 [분할 계획 8.2절](dataset-split-plan.md#82-학습-확인)에 있다.
+- 다른 모델의 로딩과 학습은 실행하지 않았다.
 
 ## 보행자 박스 검출 후보
 
@@ -41,7 +44,7 @@ RF-DETR은 설치 시 `rfdetr` 옵션을 확인한다.
 LibreYOLO 1.8.0 공식 문서를 기준으로 정리했다.
 모델별 학습 예제와 공통 검출 형식을 대조했다.
 표의 형식은 검출 작업에만 적용한다.
-실제 모델별 데이터 로딩과 학습은 실행하지 않았다.
+실제 학습은 YOLOX만 확인했다.
 [공통 데이터 형식](https://www.libreyolo.com/docs/reference/dataset-formats)
 작업별 규격은 [LibreYOLO 데이터셋 형식](../concepts/libreyolo-dataset-formats.md)을 참고한다.
 

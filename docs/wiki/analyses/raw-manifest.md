@@ -1,7 +1,7 @@
 ---
 type: analysis
 tags: [dataset, manifest, preprocessing]
-sources: ["[[aihub-095-accident]]", "[[aihub-101-cctv]]", "[[aihub-110-child-zone]]"]
+sources: ["wiki/entities/aihub-095-accident.md", "wiki/entities/aihub-101-cctv.md", "wiki/entities/aihub-110-child-zone.md"]
 created: 2026-11-24
 updated: 2026-11-24
 ---
