@@ -21,7 +21,8 @@ configs/data/*.yaml
 weights/
 
 # 실험 결과. MLflow 규격을 정할 때까지 임시로 쓴다.
-outputs/
+outputs/*
+!outputs/.gitkeep
 
 .env
 
