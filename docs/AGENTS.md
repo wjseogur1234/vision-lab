@@ -45,7 +45,7 @@ RAG처럼 질문할 때마다 원자료를 다시 찾는 대신, LLM이 원자�
 ```
 wiki/
 ├── index.md      # 목차: 주제별 대분류 → 중분류 → 페이지
-├── log.md        # 시간순 작업 기록 (append-only)
+├── log.md        # 작업 기록 (최신순)
 ├── overview.md   # 전체 종합: 프로젝트 목표, 현재 이해, 발전하는 가설, 열린 질문
 ├── sources/      # 원자료 1개당 요약 페이지 1개
 ├── entities/     # 구체적 대상: 데이터셋, 모델, 라이브러리, 도구, 코드 모듈
@@ -125,7 +125,8 @@ updated: YYYY-MM-DD
 
 - `index.md`: 주제별 대분류(기획 / 데이터 / 모델 / 자료) → 중분류 → 페이지 목록. "목차 구성 지침"을 따른다.
   각 줄: `- [slug](분류/slug.md) — 한 줄 요약`. 모든 ingest마다 갱신.
-- `log.md`: append-only, 최신이 아래. 모든 항목은 다음 접두사로 시작 (grep 가능):
+- `log.md`: 새 기록은 기존 첫 항목 위에 추가한다.
+  모든 항목은 다음 형식으로 시작한다.
 
 ```
 ## [YYYY-MM-DD] ingest | 소스 제목
@@ -133,4 +134,4 @@ updated: YYYY-MM-DD
 - 갱신: [c](analyses/c.md), [overview](overview.md)
 ```
   작업 종류: `ingest` / `query` / `lint` / `schema`.
-  최근 기록 확인: `grep "^## \[" wiki/log.md | tail -5`
+  최근 기록 확인: `grep "^## \[" wiki/log.md | head -5`
