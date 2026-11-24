@@ -21,4 +21,11 @@ COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --group prep --group train --group dev
 
+# 호스트 사용자와 같은 UID로 실행한다. 마운트 폴더에 root 소유 파일이 생기지 않는다.
+# /opt/venv는 root 소유로 남는다. 읽기만 하므로 문제없다.
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g ${GID} lab && useradd -m -u ${UID} -g ${GID} lab
+USER lab
+
 CMD ["bash"]
