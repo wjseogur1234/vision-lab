@@ -20,6 +20,9 @@ configs/data/*.yaml
 # 내려받은 가중치
 weights/
 
+# 실험 결과. MLflow 규격을 정할 때까지 임시로 쓴다.
+outputs/
+
 .env
 
 .vscode/
