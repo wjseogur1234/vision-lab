@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [libreyolo, dataset, annotation]
-sources: ["wiki/sources/libreyolo-model-reference.md"]
+sources: ["wiki/phase_1/sources/libreyolo-model-reference.md"]
 created: 2026-11-21
 updated: 2026-11-24
 ---
@@ -24,7 +24,7 @@ updated: 2026-11-24
 > - COCO 분할 경로는 이미지 폴더 1개여야 한다. 목록이나 `.txt`는 오류가 난다.
 > - 캐시 옵션(`--cache`)은 두 문서에 설명이 없다. [분할 계획 8절](../analyses/dataset-split-plan.md#8-mini-검증-결과-2026-11-24)
 각 형식의 존재가 모든 모델의 학습 지원을 뜻하지는 않는다.
-[모델별 검출 데이터 형식](../analyses/libreyolo-models.md#모델별-검출-데이터-형식)을 함께 확인한다.
+[모델별 검출 데이터 형식](../../phase_1/analyses/libreyolo-models.md#모델별-검출-데이터-형식)을 함께 확인한다.
 
 ## 공통 YAML
 

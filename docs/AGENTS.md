@@ -7,14 +7,14 @@ RAG처럼 질문할 때마다 원자료를 다시 찾는 대신, LLM이 원자�
 ## index.md / log.md
 
 - `index.md`: 주제별 대분류(기획 / 데이터 / 모델 / 자료) → 중분류 → 페이지 목록. "목차 구성 지침"을 따른다.
-  각 줄: `- [slug](분류/slug.md) — 한 줄 요약`. 모든 ingest마다 갱신.
+  각 줄: `- [slug](phase_N/종류/slug.md) — 한 줄 요약`. 모든 ingest마다 갱신.
 - `log.md`: 새 기록은 기존 첫 항목 위에 추가한다.
   모든 항목은 다음 형식으로 시작한다.
 
 ```
 ## [YYYY-MM-DD] ingest | 소스 제목
-- 생성: [a](entities/a.md), [b](sources/b.md)
-- 갱신: [c](analyses/c.md), [overview](overview.md)
+- 생성: [a](phase_0/entities/a.md), [b](phase_0/sources/b.md)
+- 갱신: [c](phase_0/analyses/c.md), [overview](overview.md)
 ```
   작업 종류: `ingest` / `query` / `lint` / `schema`.
   최근 기록 확인: `grep "^## \[" wiki/log.md | head -5`
@@ -24,7 +24,7 @@ RAG처럼 질문할 때마다 원자료를 다시 찾는 대신, LLM이 원자�
 목차(`wiki/index.md`)는 LLM이 페이지를 찾는 입구다. 목차가 커질 때 성능을 떨어뜨리는 원인은 개수 자체보다 **평면 나열, 의미 중복, 서술형 이름**이다. 항목 수는 **200개를 넘지 않게** 유지하되, 아래 규칙을 함께 지킨다.
 
 ### 1. 계층 구조 — 평면 나열 금지
-- 최상위 대분류는 **3~4개 이내**로 둔다. 그 아래에 중분류, 그 아래에 페이지를 두는 트리 구조로 만든다.
+- 최상위 대분류는 `공통`과 Phase 5개로 고정한다. 그 아래에 중분류, 그 아래에 페이지를 두는 트리 구조로 만든다.
 - 한 분류 아래 페이지가 **20개를 넘으면** 중분류로 나눈다.
 - 중분류가 커지면 `index.md`에는 중분류 허브 페이지만 걸고, 개별 페이지 목록은 허브 페이지로 옮긴다. LLM은 `index.md` → 허브 → 페이지 순서로 필요한 부분만 읽는다.
 
@@ -43,7 +43,7 @@ RAG처럼 질문할 때마다 원자료를 다시 찾는 대신, LLM이 원자�
 - 이 방식이 가능하도록 분류 이름과 설명을 질문에서 찾기 쉬운 키워드로 유지한다.
 
 ### 점검
-- 페이지를 추가하거나 lint할 때 다음을 확인한다: 총 항목 수(≤ 200), 대분류 수(≤ 4), 분류별 항목 수(≤ 20), 이름·주제 중복, 서술형 이름.
+- 페이지를 추가하거나 lint할 때 다음을 확인한다: 총 항목 수(≤ 200), 대분류 수(공통 + Phase 5개), 분류별 항목 수(≤ 20), 이름·주제 중복, 서술형 이름.
 
 ## 3개 층
 
@@ -55,36 +55,54 @@ RAG처럼 질문할 때마다 원자료를 다시 찾는 대신, LLM이 원자�
 
 ## Wiki 구조
 
-폴더는 페이지의 **종류**, `index.md`의 대분류는 **주제**다. 둘은 별개로 관리한다.
+최상위 폴더는 **Phase**다. Phase 폴더 안의 하위 폴더는 페이지의 **종류**다.
+Phase 정의는 [overview](wiki/overview.md)의 진행 단계를 따른다.
 
 ```
 wiki/
-├── index.md      # 목차: 주제별 대분류 → 중분류 → 페이지
+├── index.md      # 목차: Phase별 대분류 → 중분류 → 페이지
 ├── log.md        # 작업 기록 (최신순)
 ├── overview.md   # 전체 종합: 프로젝트 목표, 현재 이해, 발전하는 가설, 열린 질문
+├── requirements/ # 시스템 요구사항: 기능·비기능·데이터·모델, 탐지 대상 정의. Phase 공통
+├── phase_0/      # 데이터셋 구조, 데이터셋 불러오기
+├── phase_1/      # 학습
+├── phase_2/      # 추론, API 설계
+├── phase_3/      # 테스트, 평가
+└── phase_4/      # vision task 확장
+```
+
+Phase 폴더 안에는 필요한 종류 폴더만 만든다.
+
+```
+phase_N/
 ├── sources/      # 원자료 1개당 요약 페이지 1개
 ├── entities/     # 구체적 대상: 데이터셋, 모델, 라이브러리, 도구, 코드 모듈
 ├── concepts/     # 개념·방법론·주제
-├── analyses/     # Query 결과 중 남길 가치가 있는 것: 비교표, 분석, 계획
-└── requirements/ # 시스템 요구사항: 기능·비기능·데이터·모델, 탐지 대상 정의
+└── analyses/     # Query 결과 중 남길 가치가 있는 것: 비교표, 분석, 계획
 ```
 
-`index.md` 대분류 (4개, 늘리지 않는다):
+- 페이지는 한 Phase 폴더에만 둔다.
+- 여러 Phase에 걸친 페이지는 처음 다룬 Phase 폴더에 둔다. 다른 Phase에서는 링크로 가리킨다.
+- 빈 Phase 폴더는 `.gitkeep`으로 유지한다.
 
-| 대분류 | 다루는 주제 | 주로 들어가는 종류 |
+`index.md` 대분류는 `공통`과 `Phase 0`~`Phase 4`다. 늘리지 않는다.
+
+| 대분류 | 다루는 주제 | 폴더 |
 |---|---|---|
-| 기획 | 목표, 진행 단계, 요구사항, 탐지 대상 | overview, requirements |
-| 데이터 | 데이터셋 구조, 전처리, 불러오기, 저장 위치 | entities, analyses, concepts |
-| 모델 | 학습, 추론·API, 평가, vision task 확장 | entities, analyses, concepts |
-| 자료 | 논문·명세 등 원자료 요약 | sources |
+| 공통 | 목표, 진행 단계, 요구사항, 탐지 대상 | `overview.md`, `requirements/` |
+| Phase 0 | 데이터셋 구조, 전처리, 불러오기, 저장 위치 | `phase_0/` |
+| Phase 1 | 학습, 실험 관리 | `phase_1/` |
+| Phase 2 | 추론, API | `phase_2/` |
+| Phase 3 | 테스트, 평가 | `phase_3/` |
+| Phase 4 | vision task 확장 | `phase_4/` |
 
-페이지는 주제에 맞는 대분류 하나에만 올린다. 중분류는 필요할 때 만들고, 20개를 넘으면 나누거나 허브 페이지로 옮긴다.
+페이지는 폴더와 같은 대분류 하나에만 올린다. 중분류는 필요할 때 만들고, 20개를 넘으면 나누거나 허브 페이지로 옮긴다.
 
 ## 페이지 규칙
 
 - 파일명: 영어 소문자 kebab-case (`social-lstm.md`). 본문은 한국어.
 - 본문 링크는 상대 경로 Markdown 링크를 쓴다.
-  예: `[AI Hub 101](../entities/aihub-101-cctv.md)`
+  예: `[AI Hub 101](../entities/aihub-101-cctv.md)`, 다른 Phase는 `[x](../../phase_1/analyses/x.md)`
 - 절 링크에는 제목 앵커를 붙인다.
   예: `[2.1절](../entities/aihub-101-cctv.md#21-실제-파일-수)`
 - 파일명은 위키 안에서 유일하게 유지한다.
@@ -95,7 +113,7 @@ wiki/
 ---
 type: source | entity | concept | analysis | requirements | overview
 tags: []
-sources: ["wiki/sources/source-page.md"]  # docs/ 기준 경로 목록
+sources: ["wiki/phase_0/sources/source-page.md"]  # docs/ 기준 경로 목록
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---
@@ -117,7 +135,7 @@ updated: YYYY-MM-DD
 기본은 **한 번에 소스 하나, 사람과 함께**.
 1. `raw/`의 소스를 읽는다 (이미지가 있으면 텍스트 먼저, 그다음 필요한 이미지를 따로 본다).
 2. 핵심 요점을 사람과 간단히 논의하고, 무엇을 강조할지 확인한다.
-3. `wiki/sources/<slug>.md` 요약 작성: 핵심 주장, 방법, 수치/결과, 한계, 이 프로젝트와의 관련성.
+3. `wiki/phase_N/sources/<slug>.md` 요약 작성: 핵심 주장, 방법, 수치/결과, 한계, 이 프로젝트와의 관련성.
 4. 소스가 바꾸는 entity/concept 페이지를 생성하거나 갱신한다. 모순·대체 표시.
 5. `overview.md`의 종합/가설 갱신.
 6. `index.md` 갱신, `log.md`에 항목 추가.
@@ -125,7 +143,7 @@ updated: YYYY-MM-DD
 ### Query — 질문
 1. `index.md`를 먼저 읽고 관련 페이지를 찾아 읽는다 (필요하면 grep).
 2. 출처 링크와 함께 답한다. 형식은 질문에 맞게: 문단, 비교표, Marp 슬라이드, matplotlib 차트 등.
-3. 재사용 가치가 있는 답은 `wiki/analyses/`에 저장하고 index/log 갱신 (사람에게 저장 여부를 제안).
+3. 재사용 가치가 있는 답은 `wiki/phase_N/analyses/`에 저장하고 index/log 갱신 (사람에게 저장 여부를 제안).
 
 ### Lint — "lint 해줘"
 점검 후 보고하고, 승인받은 것만 고친다:

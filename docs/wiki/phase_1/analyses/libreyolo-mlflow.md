@@ -1,7 +1,7 @@
 ---
 type: analysis
 tags: [libreyolo, mlflow, experiment-tracking]
-sources: ["wiki/sources/libreyolo-model-reference.md"]
+sources: ["wiki/phase_1/sources/libreyolo-model-reference.md"]
 created: 2026-11-24
 updated: 2026-11-24
 ---
@@ -98,4 +98,4 @@ model.train(
 > [!question] `libreyolo monitor`
 > run 파일을 읽어 보여 주는 읽기 전용 대시보드다. MLflow를 대신하지 못한다. 쓰임은 확인하지 않았다.
 
-관련 페이지: [libreyolo-models](libreyolo-models.md), [분할 계획 8.2절](dataset-split-plan.md#82-학습-확인)
+관련 페이지: [libreyolo-models](libreyolo-models.md), [분할 계획 8.2절](../../phase_0/analyses/dataset-split-plan.md#82-학습-확인)

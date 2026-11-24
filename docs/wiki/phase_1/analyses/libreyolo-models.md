@@ -1,7 +1,7 @@
 ---
 type: analysis
 tags: [libreyolo, object-detection]
-sources: ["wiki/sources/libreyolo-model-reference.md"]
+sources: ["wiki/phase_1/sources/libreyolo-model-reference.md"]
 created: 2026-11-19
 updated: 2026-11-24
 ---
@@ -9,17 +9,17 @@ updated: 2026-11-24
 # LibreYOLO 모델
 
 이 프로젝트의 첫 과제는 CCTV 보행자 검출이다.
-학습에는 [aihub-101-cctv](../entities/aihub-101-cctv.md) 데이터를 쓴다.
+학습에는 [aihub-101-cctv](../../phase_0/entities/aihub-101-cctv.md) 데이터를 쓴다.
 
 ## 프로젝트 환경
 
-- `train` 그룹은 `libreyolo==1.8.0`를 지정한다. [pyproject.toml](../../../pyproject.toml)
+- `train` 그룹은 `libreyolo==1.8.0`를 지정한다. [pyproject.toml](../../../../pyproject.toml)
 - 확인일 기준 PyPI 최신 버전은 1.8.0이다. [libreyolo-model-reference](../sources/libreyolo-model-reference.md)
 - 의존성은 프로젝트의 `uv.lock`에 잠겨 있다.
 - Docker의 `lab` 서비스에서 학습 환경을 실행한다.
 - `lab`은 호스트와 같은 UID(기본 1000)의 `lab` 계정으로 실행한다. 결과 파일이 root 소유가 되지 않는다.
 - 가중치는 프로젝트 루트의 `weights/`에 내려받는다.
-- YOLOX-s(`yolox-s`)로 COCO JSON 학습 1 epoch를 확인했다(2026-11-24). 결과는 [분할 계획 8.2절](dataset-split-plan.md#82-학습-확인)에 있다.
+- YOLOX-s(`yolox-s`)로 COCO JSON 학습 1 epoch를 확인했다(2026-11-24). 결과는 [분할 계획 8.2절](../../phase_0/analyses/dataset-split-plan.md#82-학습-확인)에 있다.
 - 다른 모델의 로딩과 학습은 실행하지 않았다.
 - 실험 기록 도구 연동은 [libreyolo-mlflow](libreyolo-mlflow.md)에 있다.
 
@@ -47,7 +47,7 @@ LibreYOLO 1.8.0 공식 문서를 기준으로 정리했다.
 표의 형식은 검출 작업에만 적용한다.
 실제 학습은 YOLOX만 확인했다.
 [공통 데이터 형식](https://www.libreyolo.com/docs/reference/dataset-formats)
-작업별 규격은 [LibreYOLO 데이터셋 형식](../concepts/libreyolo-dataset-formats.md)을 참고한다.
+작업별 규격은 [LibreYOLO 데이터셋 형식](../../phase_0/concepts/libreyolo-dataset-formats.md)을 참고한다.
 
 | 모델 계열 | 검출 학습 데이터 형식 | 모델 문서 |
 |---|---|---|
