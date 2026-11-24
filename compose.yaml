@@ -7,7 +7,6 @@ services:
     volumes:
       - .:/app
       - ${RAW_DATA_DIR:?.env 파일에 RAW_DATA_DIR을 적는다}:${RAW_DATA_DIR}:ro
-      - /mnt/data1/downloads/dataset_hdd-8tb/interim/project_261121:/mnt/data1/downloads/dataset_hdd-8tb/interim/project_261121
     shm_size: "8gb"
     stdin_open: true
     tty: true

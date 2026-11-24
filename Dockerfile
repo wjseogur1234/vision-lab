@@ -15,10 +15,10 @@ RUN apt-get update \
 
 COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-install-project --group prep --group train
+    uv sync --locked --no-install-project --group prep --group train --group dev
 
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --group prep --group train
+    uv sync --locked --group prep --group train --group dev
 
 CMD ["bash"]

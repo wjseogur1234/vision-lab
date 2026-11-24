@@ -28,7 +28,6 @@
 
 - `data/raw/`를 읽고 `data/processed/`에 결과를 쓴다.
 - 중간 파일은 `data/interim/`에 쓴다. 이 폴더는 지워도 된다.
-- HDD 중간 파일은 `data/interim/HDD/project_261121`에 쓴다.
 - `.env`의 `RAW_DATA_DIR`은 읽기 전용으로 연결된다.
 - 호스트의 NVIDIA GPU를 `lab`에 할당한다.
 
