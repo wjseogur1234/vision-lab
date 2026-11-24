@@ -1,0 +1,30 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+data/raw/*
+data/interim/*
+data/processed/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+
+# build_coco가 만드는 LibreYOLO 설정. 다시 만들 수 있다.
+# 분할 안(*.splits.yaml)은 검토 대상이라 커밋한다.
+configs/data/*.yaml
+!configs/data/*.splits.yaml
+
+# 내려받은 가중치
+weights/
+
+# 실험 결과. MLflow 규격을 정할 때까지 임시로 쓴다.
+outputs/*
+!outputs/.gitkeep
+
+.env
+
+.vscode/
+.claude/

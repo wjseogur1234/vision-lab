@@ -1,0 +1,45 @@
+# python -m data.build_coco
+defaults:
+  - common
+  # configs/data/의 분할 파일을 split_plan 키로 읽는다.
+  # 바꾸기: data@split_plan=aihub101-ped-v2.splits
+  - /data@split_plan: aihub101-ped-v1.splits
+  - _self_
+
+hydra:
+  # configs/data/를 data 그룹으로 찾는다. 프로젝트 루트에서 실행한다.
+  searchpath:
+    - file://configs
+
+name: aihub101-ped-v1
+manifest: data/interim/raw-manifests/101/manifest.csv
+raw_dir: data/raw
+dataset_folder: 101.교통문제_해결을_위한_CCTV_교통_데이터(시내도로)
+output_dir: data/processed
+# 원본 101 Bbox 라벨에서 보행자의 category_id
+source_category: 7
+# COCO와 LibreYOLO YAML에 쓸 클래스 이름
+class_name: person
+config_dir: configs/data
+# 배경 이미지 비율. 범위는 [0, 1)이다.
+background_ratio: 0.1
+# 보행자 이미지를 뽑는 비율. 범위는 (0, 1]이다.
+fraction: 1.0
+seed: 0
+overwrite: false
+# manifest.csv의 열 순서
+manifest_fields:
+  - file_name
+  - split
+  - location
+  - camera
+  - weather
+  - time_of_day
+  - width
+  - height
+  - num_persons
+  - source_split
+  - label_file
+  - label_image_id
+# issues.csv의 열 순서. 코드의 문제 항목 순서와 맞춘다.
+issue_fields: [file_name, issue, detail]

@@ -1,0 +1,17 @@
+# @package _global_
+# 전처리 스크립트의 공통 Hydra 설정이다.
+# Hydra 출력 폴더와 로그 파일을 만들지 않는다. 작업 폴더도 바꾸지 않는다.
+log_level: INFO
+# log_level로 쓸 수 있는 값
+log_levels: [DEBUG, INFO, WARNING]
+
+defaults:
+  - override /hydra/job_logging: none
+  - override /hydra/hydra_logging: none
+
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+  job:
+    chdir: false

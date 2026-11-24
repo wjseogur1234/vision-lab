@@ -1,0 +1,22 @@
+services:
+  lab:
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: vision-lab
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ${RAW_DATA_DIR:?.env 파일에 RAW_DATA_DIR을 적는다}:${RAW_DATA_DIR}:ro
+    shm_size: "8gb"
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

@@ -1,0 +1,51 @@
+[project]
+name = "vision-lab"
+version = "0.0.0"
+description = "LibreYOLO 기반 vision AI 학습 프로젝트 (CCTV 보행자 검출)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+# ---------- 전처리 환경 ----------
+prep = [
+    "hydra-core>=1.3.2",
+    "pandas>=2.3.3",
+    "pillow>=11.0",
+    "pycocotools>=2.0.11",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+]
+# ---------- 학습 환경 ----------
+train = [
+    "libreyolo==1.8.0",
+    # LibreYOLO의 의존성이지만, 아래 CUDA 인덱스를 적용하려고 직접 적는다.
+    "torch>=2.4.0",
+    "torchvision>=0.19.0",
+]
+# ---------- 개발 도구 (공통) ----------
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.14.10",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/data"]
+
+[tool.uv.sources]
+# RTX 50 시리즈는 CUDA 12.8 이상 빌드가 필요하다.
+torch = [{ index = "pytorch-cu128", marker = "sys_platform != 'darwin'" }]
+torchvision = [{ index = "pytorch-cu128", marker = "sys_platform != 'darwin'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
