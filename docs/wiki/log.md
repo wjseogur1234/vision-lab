@@ -2,6 +2,10 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-24] lint | 이미지 복사 없이 원본 경로 사용
+- 근거: LibreYOLO는 YAML 루트와 COCO `file_name`을 이어서 이미지를 읽는다.
+- 갱신: [dataset-split-plan](analyses/dataset-split-plan.md)
+
 ## [2026-11-24] query | 원본 manifest 생성 결과
 - 근거: `data/interim/raw-manifests/`의 CSV 3개를 집계했다.
 - 생성: [raw-manifest](analyses/raw-manifest.md)

@@ -65,7 +65,7 @@ updated: 2026-11-24
 1. 각 분할의 JSON을 읽어 이미지 목록을 만든다.
 2. 분할, 카메라 ID, 파일 이름으로 JPG를 찾는다.
 3. JPG가 없거나 후보가 여러 개면 기록한다.
-4. 선택한 JPG만 전처리 결과 폴더에 복사한다.
+4. JPG는 복사하지 않는다. 원본 경로를 그대로 쓴다.
 
 입력 경로는 [aihub-101-cctv 2절](../entities/aihub-101-cctv.md#2-폴더-구조)을 따른다.
 
@@ -81,6 +81,7 @@ updated: 2026-11-24
 ### 5.3 라벨 변환
 
 라벨 형식은 COCO JSON으로 정한다(2026-11-21). YOLO TXT는 쓰지 않는다.
+YOLO TXT는 이미지 옆 `labels/` 폴더가 필요하다. 원본은 읽기 전용이라 쓸 수 없다.
 LibreYOLO 규격은 [데이터셋 형식](../concepts/libreyolo-dataset-formats.md#공통-yaml)을 참고한다.
 
 - 분할마다 JSON 파일 1개를 만든다.
@@ -89,7 +90,8 @@ LibreYOLO 규격은 [데이터셋 형식](../concepts/libreyolo-dataset-formats.
 - `categories`에는 `{"id": 1, "name": "person"}` 1개만 둔다.
 - `[x1, y1, x2, y2]` 픽셀 값을 `bbox: [x, y, w, h]` 픽셀 값으로 바꾼다. 정규화하지 않는다.
 - `area`는 `w * h`로 적는다.
-- `file_name`은 분할 이미지 폴더 기준 상대 경로로 적는다.
+- `file_name`은 `data/raw/` 기준 상대 경로로 적는다.
+- 경로 앞에 데이터셋 폴더 이름을 넣는다. 110을 섞어도 루트가 같다.
 - 이미지 크기는 이미지 파일에서 읽는다. 라벨에 크기가 없다.
 - 이미지 밖으로 나간 좌표는 잘라 낸다.
 - 잘라 낸 뒤 `w` 또는 `h`가 0 이하인 상자는 버리고 기록한다.
@@ -99,7 +101,6 @@ LibreYOLO 규격은 [데이터셋 형식](../concepts/libreyolo-dataset-formats.
 
 ```text
 <전처리 결과 경로>/aihub101-ped-v1/
-├── images/{train,val,test}/<카메라ID>__<원본 파일 이름>.jpg
 ├── annotations/{train,val,test}.json
 └── manifest.csv
 
@@ -108,7 +109,11 @@ configs/data/
 └── aihub101-ped-v1.splits.yaml   장소별 분할 목록
 ```
 
-- 파일 이름 앞에 카메라 ID를 붙인다. 카메라가 달라도 이름이 겹치지 않는다.
+- 이미지는 복사하지 않는다. 원본 경로가 이미 겹치지 않는다.
+- YAML의 `train`, `val`, `test`는 모두 `/app/data/raw`로 적는다.
+- LibreYOLO는 이 루트와 `file_name`을 이어서 이미지를 읽는다.
+- 저장 위치가 바뀌면 `data/raw/` 링크만 고친다.
+- HDD가 너무 느리면 이미지를 SSD로 복사한다. 그때는 YAML 루트만 바꾼다.
 - YAML의 `names`는 `{0: person}`으로 적는다. COCO의 카테고리 이름과 같아야 한다.
 - 폴더 이름에 버전(`v1`)을 넣는다. 거르는 기준을 바꾸면 `v2`를 새로 만든다.
 
@@ -117,7 +122,7 @@ configs/data/
 
 | 열 | 내용 | 값 예 |
 |---|---|---|
-| `file_name` | 분할 이미지 폴더 기준 경로 | `BC01__xxx.jpg` |
+| `file_name` | `data/raw/` 기준 원본 경로 | `101.교통문제_.../01.데이터/.../xxx.jpg` |
 | `location` | 장소 | 원본의 장소 이름 |
 | `camera` | 카메라 ID | `BC01` |
 | `weather` | 날씨 | `sunny`, `rainy`, `cloudy`, `foggy`, `snow` |
