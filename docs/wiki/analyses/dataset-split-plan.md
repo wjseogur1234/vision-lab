@@ -256,7 +256,7 @@ LibreYOLO 1.8.0으로 1 epoch를 학습했다.
 ```bash
 docker compose run --rm lab libreyolo train --data configs/data/aihub101-ped-mini.yaml \
   --model yolox-s --epochs 1 --cache false \
-  --project data/interim/runs --name smoke-mini
+  --project outputs/runs --name smoke-mini
 ```
 
 | 항목 | 값 |

@@ -24,6 +24,8 @@ LibreYOLO로 vision AI 모델을 학습한다. 첫 과제는 CCTV 보행자 검�
 현재는 Phase 0을 진행하고 있다.
 mini 데이터셋으로 COCO 생성과 학습 1 epoch를 확인했다.
 다음은 분할 안 고정과 전체 v1 생성이다.
+실험 결과는 임시로 `outputs/`에 둔다.
+MLflow 도입을 검토하고 있다. ([libreyolo-mlflow](analyses/libreyolo-mlflow.md))
 
 ## 현재 이해
 - 원본 데이터셋은 3개다: [aihub-101-cctv](entities/aihub-101-cctv.md), [aihub-095-accident](entities/aihub-095-accident.md), [aihub-110-child-zone](entities/aihub-110-child-zone.md).
@@ -40,4 +42,5 @@ mini 데이터셋으로 COCO 생성과 학습 1 epoch를 확인했다.
 ## 열린 질문
 - 장소 배정 안, 배경 비율, 카메라별 프레임 상한을 정해야 한다. ([dataset-split-plan 7절](analyses/dataset-split-plan.md#7-정해야-할-것))
 - 전체 v1을 HDD에서 읽을 때 학습 속도를 확인해야 한다.
+- MLflow 기록 규격을 정해야 한다. ([libreyolo-mlflow 6절](analyses/libreyolo-mlflow.md))
 - 101 라벨의 `guideline`이 무엇인지 확인해야 한다. ([aihub-101-cctv 3.3절](entities/aihub-101-cctv.md#33-라벨-json-형식))

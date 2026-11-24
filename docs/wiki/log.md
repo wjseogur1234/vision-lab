@@ -2,6 +2,10 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-24] lint | 진행 상황 갱신
+- 수정: 학습 결과 경로 `data/interim/runs` → `outputs/runs`.
+- 갱신: [overview](overview.md), [dataset-split-plan](analyses/dataset-split-plan.md)
+
 ## [2026-11-24] query | LibreYOLO MLflow 지원 여부
 - 근거: 설치된 `libreyolo==1.8.0` 코드, [Experiment loggers](https://www.libreyolo.com/docs/train/loggers).
 - 생성: [libreyolo-mlflow](analyses/libreyolo-mlflow.md)
