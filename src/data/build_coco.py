@@ -2,6 +2,7 @@ import csv
 import json
 import logging
 import random
+import re
 import shutil
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -10,6 +11,21 @@ import yaml
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
+
+VERSION_SUFFIX = re.compile(r"^(?P<base>.+)-v(?P<number>\d+)$")
+
+
+def free_name(name, output_dir, config_dir):
+    def taken(candidate):
+        return (output_dir / candidate).exists() or (config_dir / f"{candidate}.yaml").exists()
+
+    match = VERSION_SUFFIX.match(name)
+    base, number = (match["base"], int(match["number"])) if match else (name, 1)
+    candidate = name
+    while taken(candidate):
+        number += 1
+        candidate = f"{base}-v{number}"
+    return candidate
 
 
 def read_manifest(path):

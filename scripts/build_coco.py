@@ -6,7 +6,7 @@ from _common import CONFIG_PATH, setup_logging, to_args
 from hydra.core.hydra_config import HydraConfig
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from data.build_coco import collect, load_splits, select, write_config, write_dataset
+from data.build_coco import collect, free_name, load_splits, select, write_config, write_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,11 @@ def main(cfg):
         logger.error("background_ratio는 [0, 1), fraction은 (0, 1] 범위여야 합니다.")
         sys.exit(2)
 
+    if not args.overwrite:
+        name = free_name(args.name, args.output_dir, args.config_dir)
+        if name != args.name:
+            logger.warning("%s이 이미 있어 %s로 만듭니다.", args.name, name)
+        args.name = name
     destination = args.output_dir / args.name
     try:
         split_names, split_of = load_splits(args.split_plan)

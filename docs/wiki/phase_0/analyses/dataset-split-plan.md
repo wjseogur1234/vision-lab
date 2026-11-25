@@ -223,6 +223,7 @@ docker compose run --rm lab python scripts/build_coco.py [name=N fraction=F over
 - HDD가 너무 느리면 이미지를 SSD로 복사한다. 그때는 YAML 루트만 바꾼다.
 - YAML의 `names`는 `{0: person}`으로 적는다. COCO의 카테고리 이름과 같아야 한다.
 - 폴더 이름에 버전(`v1`)을 넣는다. 거르는 기준을 바꾸면 `v2`를 새로 만든다.
+- 같은 이름이 있으면 `build_coco.py`가 버전을 올린다. `overwrite=true`면 덮어쓴다.
 
 `manifest.csv`는 이미지 정보를 모은 표다. 이미지 1장이 1행이다. LibreYOLO는 이 파일을 읽지 않는다.
 `width`와 `height`는 COCO `images` 항목과 같은 값을 쓴다.

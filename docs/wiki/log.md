@@ -2,6 +2,10 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-26] schema | Phase 0 실행 스크립트 분리
+- 근거: `src/data/`의 실행 로직을 `scripts/`로 옮겼다. 같은 이름의 데이터셋은 버전을 올린다.
+- 갱신: [dataset-split-plan](phase_0/analyses/dataset-split-plan.md), [raw-manifest](phase_0/analyses/raw-manifest.md)
+
 ## [2026-11-24] schema | Phase 폴더로 위키 재구성
 - 규칙: 최상위 폴더를 `phase_0`~`phase_4`로 나눈다. 종류 폴더는 Phase 폴더 안에 둔다.
 - 규칙: `index.md` 대분류를 `공통`, `Phase 0`~`Phase 4`로 바꾼다.

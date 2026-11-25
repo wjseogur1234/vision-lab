@@ -151,6 +151,8 @@ docker compose run --rm lab python scripts/build_coco.py name=aihub101-ped-mini 
 - `build_coco`는 분할 파일을 Hydra로 읽는다. 기본값은 `aihub101-ped-v1.splits`다.
 - 분할 파일을 바꾸려면 `data@split_plan=aihub101-ped-v2.splits`를 붙인다.
 - `build_coco`는 `data/processed/<이름>/`에 COCO JSON과 manifest를 쓴다.
+- 같은 이름의 결과가 있으면 버전을 올려 새로 만든다. 예: `v2` → `v3`.
+- 이름에 버전이 없으면 `-v2`를 붙인다. `overwrite=true`면 같은 이름에 덮어쓴다.
 - `build_coco`는 LibreYOLO YAML을 `configs/data/<이름>.yaml`에 쓴다.
 - 이미지는 복사하지 않는다. COCO `file_name`은 `data/raw/` 기준 원본 경로다.
 
