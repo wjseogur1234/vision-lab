@@ -2,6 +2,11 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-26] schema | 결정 기록(ADR) 도입
+- 근거: 이웃 프로젝트(project-HNU-2026_residual-pedestrian)의 ADR 규칙과 템플릿을 옮겼다.
+- 생성: `docs/adr/`, `wiki/.templates/adr-template.md`, [adr-0001-coco-json-labels](../adr/adr-0001-coco-json-labels.md), [adr-0002-scripts-by-output-stage](../adr/adr-0002-scripts-by-output-stage.md)
+- 갱신: `docs/AGENTS.md` (층 구성 표, frontmatter `adr`, "결정 기록 (ADR)" 절), [dataset-split-plan](phase_0/analyses/dataset-split-plan.md) (5.3절, 5.4절 링크), [index](index.md) (Phase 0 > 결정)
+
 ## [2026-11-26] schema | Phase 0 실행 스크립트 분리
 - 근거: `src/data/`의 실행 로직을 `scripts/`로 옮겼다. 같은 이름의 데이터셋은 버전을 올린다.
 - 갱신: [dataset-split-plan](phase_0/analyses/dataset-split-plan.md), [raw-manifest](phase_0/analyses/raw-manifest.md)

@@ -3,7 +3,7 @@ type: analysis
 tags: [dataset, split, preprocessing, coco]
 sources: ["wiki/phase_0/analyses/raw-manifest.md", "wiki/phase_0/entities/aihub-101-cctv.md"]
 created: 2026-11-16
-updated: 2026-11-24
+updated: 2026-11-26
 ---
 
 # 데이터셋 분할 계획 — AI Hub 101 Bbox와 110
@@ -166,7 +166,7 @@ docker compose run --rm lab python scripts/propose_splits.py
 
 ### 5.3 라벨 변환
 
-라벨 형식은 COCO JSON으로 정한다(2026-11-21). YOLO TXT는 쓰지 않는다.
+라벨 형식은 COCO JSON으로 정한다(2026-11-21). YOLO TXT는 쓰지 않는다. 이유: [ADR-0001](../../../adr/adr-0001-coco-json-labels.md).
 YOLO TXT는 이미지 옆 `labels/` 폴더가 필요하다. 원본은 읽기 전용이라 쓸 수 없다.
 LibreYOLO 규격은 [데이터셋 형식](../concepts/libreyolo-dataset-formats.md#공통-yaml)을 참고한다.
 
@@ -224,6 +224,7 @@ docker compose run --rm lab python scripts/build_coco.py [name=N fraction=F over
 - YAML의 `names`는 `{0: person}`으로 적는다. COCO의 카테고리 이름과 같아야 한다.
 - 폴더 이름에 버전(`v1`)을 넣는다. 거르는 기준을 바꾸면 `v2`를 새로 만든다.
 - 같은 이름이 있으면 `build_coco.py`가 버전을 올린다. `overwrite=true`면 덮어쓴다.
+- 실행 스크립트를 단계별로 나눈 이유: [ADR-0002](../../../adr/adr-0002-scripts-by-output-stage.md).
 
 `manifest.csv`는 이미지 정보를 모은 표다. 이미지 1장이 1행이다. LibreYOLO는 이 파일을 읽지 않는다.
 `width`와 `height`는 COCO `images` 항목과 같은 값을 쓴다.

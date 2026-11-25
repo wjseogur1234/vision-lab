@@ -18,6 +18,10 @@
 - [dataset-split-plan](phase_0/analyses/dataset-split-plan.md) — 분할 계획. 장소 단위 분할, 장소별 수, COCO JSON 결과 구조, mini 검증 결과 (일부 미정)
 - [libreyolo-dataset-formats](phase_0/concepts/libreyolo-dataset-formats.md) — 작업별 라벨, YAML, 파일 구조
 
+### 결정
+- [adr-0001-coco-json-labels](../adr/adr-0001-coco-json-labels.md) — 라벨 형식 COCO JSON, 이미지 복사 없음 (승인)
+- [adr-0002-scripts-by-output-stage](../adr/adr-0002-scripts-by-output-stage.md) — 실행 스크립트 산출물 단계 분리, Hydra는 scripts만 (승인)
+
 ## Phase 1 — 학습
 ### 객체 검출
 - [libreyolo-models](phase_1/analyses/libreyolo-models.md) — 보행자 검출 후보, 설치 조건, 실행 환경, 검증 범위
