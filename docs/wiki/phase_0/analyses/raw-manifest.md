@@ -17,12 +17,12 @@ AI Hub의 원본 분할을 `source_split`에 기록한다.
 프로젝트 루트에서 실행한다.
 
 ```bash
-docker compose run --rm lab python -m data.raw_manifest
+docker compose run --rm lab python scripts/build_raw_manifest.py
 ```
 
 결과는 `data/interim/raw-manifests/<번호>/manifest.csv`에 저장한다.
 `dataset=[101]`을 붙이면 101만 처리한다.
-입력 경로와 매칭 규칙은 [생성 코드](../../../../src/data/raw_manifest.py)에 있다.
+입력 경로와 매칭 규칙은 [생성 코드](../../../../src/data/raw_manifest.py)와 [실행 스크립트](../../../../scripts/build_raw_manifest.py)에 있다.
 
 | 데이터셋 | 대상 | 매칭 기준 |
 |---|---|---|

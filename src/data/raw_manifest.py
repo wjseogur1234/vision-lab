@@ -1,20 +1,14 @@
-"""AI Hub 원본 파일과 라벨의 대응을 CSV로 기록한다."""
-
 import csv
 import json
 import os
-import sys
 import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import NamedTuple
 
-import hydra
 from PIL import Image
 from tqdm import tqdm
-
-from data.config import CONFIG_PATH, to_args
 
 
 class Label(NamedTuple):
@@ -80,8 +74,8 @@ def voc_label(path):
     )
 
 
-def index_dataset(root, dataset, settings):
-    image_suffixes = set(settings.image_suffixes)
+def index_dataset(root, dataset, image_suffixes, time_of_day):
+    image_suffixes = set(image_suffixes)
     media = defaultdict(list)
     labels = defaultdict(list)
     files = tqdm(source_files(root), desc=f"{dataset} 파일 찾기", unit="개")
@@ -92,7 +86,7 @@ def index_dataset(root, dataset, settings):
             if parts[2] != "교통안전(Bbox)":
                 continue
             if suffix == ".json":
-                for key, label in bbox_labels(path, settings.time_of_day):
+                for key, label in bbox_labels(path, time_of_day):
                     labels[(split, "", *key)].append(label)
             elif suffix in image_suffixes:
                 location, camera = path.parent.parent.name, path.parent.name
@@ -100,7 +94,6 @@ def index_dataset(root, dataset, settings):
                 media[key].append(path)
             continue
 
-        # 원천과 라벨 폴더에서 같은 추가분 접미사를 사용한다.
         folder = parts[2]
         stem = path.stem.casefold()
         if dataset == "095":
@@ -121,8 +114,8 @@ def index_dataset(root, dataset, settings):
     return media, labels
 
 
-def manifest_rows(root, dataset, settings):
-    media, labels = index_dataset(root, dataset, settings)
+def manifest_rows(root, dataset, image_suffixes, time_of_day):
+    media, labels = index_dataset(root, dataset, image_suffixes, time_of_day)
     keys = sorted(media.keys() | labels.keys())
     for key in tqdm(keys, desc=f"{dataset} 매칭·크기 읽기", unit="개"):
         files, annotations = media.get(key, []), labels.get(key, [])
@@ -165,7 +158,7 @@ def standard_row(root, dataset, path, label):
     return row
 
 
-def write_manifest(root, dataset, destination, settings):
+def write_manifest(root, dataset, destination, fields, image_suffixes, time_of_day):
     destination.parent.mkdir(parents=True, exist_ok=True)
     rows = Counter()
     with NamedTemporaryFile(
@@ -173,9 +166,9 @@ def write_manifest(root, dataset, destination, settings):
     ) as stream:
         temporary = Path(stream.name)
         try:
-            writer = csv.DictWriter(stream, fieldnames=settings.fields)
+            writer = csv.DictWriter(stream, fieldnames=fields)
             writer.writeheader()
-            for row in manifest_rows(root, dataset, settings):
+            for row in manifest_rows(root, dataset, image_suffixes, time_of_day):
                 writer.writerow(row)
                 rows[row["match_status"]] += 1
             stream.close()
@@ -185,26 +178,8 @@ def write_manifest(root, dataset, destination, settings):
     return rows
 
 
-@hydra.main(version_base=None, config_path=CONFIG_PATH, config_name="raw_manifest")
-def main(cfg):
-    args = to_args(cfg, paths=("raw_dir", "output_dir"))
-    # CLI의 dataset=[095]는 정수 95로 읽힌다. 세 자리 문자열로 맞춘다.
-    datasets = [str(name).zfill(3) for name in args.dataset]
-    unknown = set(datasets) - set(args.known_datasets)
-    if unknown:
-        sys.exit(f"알 수 없는 dataset: {sorted(unknown)}")
-    for dataset in dict.fromkeys(datasets):
-        roots = sorted(path for path in args.raw_dir.glob(f"{dataset}.*") if path.is_dir())
-        if len(roots) != 1:
-            sys.exit(f"{args.raw_dir}에서 {dataset}.* 폴더를 하나 찾을 수 있어야 합니다.")
-        destination = args.output_dir / dataset / "manifest.csv"
-        try:
-            rows = write_manifest(roots[0], dataset, destination, args)
-        except (OSError, ValueError, KeyError, ET.ParseError) as error:
-            sys.exit(f"{dataset}: {error}")
-        summary = ", ".join(f"{status}={count}" for status, count in sorted(rows.items()))
-        print(f"{destination}: {summary}", flush=True)
-
-
-if __name__ == "__main__":
-    main()
+def find_dataset_root(raw_dir, dataset):
+    roots = sorted(path for path in raw_dir.glob(f"{dataset}.*") if path.is_dir())
+    if len(roots) != 1:
+        raise ValueError(f"{raw_dir}에서 {dataset}.* 폴더를 하나 찾을 수 있어야 합니다.")
+    return roots[0]

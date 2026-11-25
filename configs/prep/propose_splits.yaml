@@ -1,4 +1,4 @@
-# python -m data.split_locations
+# python scripts/propose_splits.py
 defaults:
   - common
   - _self_

@@ -8,7 +8,7 @@
 | 단계 | 내용 | 코드 위치 | 상태 |
 |---|---|---|---|
 | 준비 | 프로젝트 구성, 라이브러리 환경 | `pyproject.toml` | 완료 |
-| Phase 0 | 데이터셋 구조, 데이터셋 불러오기 | `src/data/` | 진행 중 |
+| Phase 0 | 데이터셋 구조, 데이터셋 불러오기 | `src/data/`, `scripts/` | 진행 중 |
 
 ## 폴더
 
@@ -100,13 +100,29 @@ UID와 GID는 기본 1000이다. 호스트 사용자와 같아야 결과 파일�
 
 ## 데이터
 
+### 실행 스크립트
+
+`scripts/`에 실행 스크립트를 둔다. `src/data/`에는 라이브러리 함수만 둔다.
+Hydra 설정 읽기, 로그 설정, 종료 코드는 스크립트에서 처리한다.
+스크립트는 산출물 단위로 나눈다. 아래 순서로 실행한다.
+
+| 단계 | 스크립트 | 입력 | 출력 |
+| --- | --- | --- | --- |
+| 1 | `build_raw_manifest.py` | `data/raw/` | `data/interim/raw-manifests/` |
+| 2 | `propose_splits.py` | 101 manifest | `configs/data/*.splits.yaml` |
+| 3 | `build_coco.py` | 101 manifest, 분할 안 | `data/processed/`, `configs/data/` |
+
+- 2단계 결과는 사람이 검토한 뒤 git에 올린다.
+- 그래서 세 단계를 하나로 묶지 않는다.
+- 3단계는 확정된 분할 안만 읽는다. 2단계를 다시 실행하지 않는다.
+
 ### 원본 manifest
 
 데이터셋마다 원본 파일과 라벨의 대응을 CSV로 기록한다.
 
 ```bash
-docker compose run --rm lab python -m data.raw_manifest
-docker compose run --rm lab python -m data.raw_manifest dataset=[101]
+docker compose run --rm lab python scripts/build_raw_manifest.py
+docker compose run --rm lab python scripts/build_raw_manifest.py dataset=[101]
 ```
 
 기본 결과 경로는 `data/interim/raw-manifests/<데이터셋 번호>/manifest.csv`다.
@@ -124,14 +140,14 @@ docker compose run --rm lab python -m data.raw_manifest dataset=[101]
 ### 학습 데이터셋 만들기
 
 ```bash
-docker compose run --rm lab python -m data.split_locations
-docker compose run --rm lab python -m data.build_coco
-docker compose run --rm lab python -m data.build_coco name=aihub101-ped-mini fraction=0.065
+docker compose run --rm lab python scripts/propose_splits.py
+docker compose run --rm lab python scripts/build_coco.py
+docker compose run --rm lab python scripts/build_coco.py name=aihub101-ped-mini fraction=0.065
 ```
 
 - 기본 설정은 `configs/prep/<스크립트 이름>.yaml`에 있다.
 - 설정은 `키=값` 형식으로 덮어쓴다. `--cfg job`을 붙이면 최종 설정을 보여 준다.
-- `split_locations`는 장소 단위 분할 안을 `configs/data/aihub101-ped-v2.splits.yaml`에 쓴다.
+- `propose_splits`는 장소 단위 분할 안을 `configs/data/aihub101-ped-v2.splits.yaml`에 쓴다.
 - `build_coco`는 분할 파일을 Hydra로 읽는다. 기본값은 `aihub101-ped-v1.splits`다.
 - 분할 파일을 바꾸려면 `data@split_plan=aihub101-ped-v2.splits`를 붙인다.
 - `build_coco`는 `data/processed/<이름>/`에 COCO JSON과 manifest를 쓴다.

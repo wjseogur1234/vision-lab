@@ -1,4 +1,4 @@
-# python -m data.build_coco
+# python scripts/build_coco.py
 defaults:
   - common
   # configs/data/의 분할 파일을 split_plan 키로 읽는다.

@@ -1,4 +1,4 @@
-# python -m data.raw_manifest
+# python scripts/build_raw_manifest.py
 defaults:
   - common
   - _self_

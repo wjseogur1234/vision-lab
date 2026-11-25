@@ -39,7 +39,7 @@
 
 ```bash
 docker compose run --rm lab uv add --group prep <패키지>
-docker compose run --rm lab python -m data.build_coco --cfg job
+docker compose run --rm lab python scripts/build_coco.py --cfg job
 ```
 
 - 의존성을 바꾸면 이미지를 다시 빌드한다(`docker compose build lab`).

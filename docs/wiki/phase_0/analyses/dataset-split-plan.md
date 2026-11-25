@@ -61,7 +61,7 @@ updated: 2026-11-24
 결과 목록은 파일로 고정한다. 다시 실행해도 같은 결과가 나온다.
 
 ```bash
-docker compose run --rm lab python -m data.split_locations
+docker compose run --rm lab python scripts/propose_splits.py
 ```
 
 ### 4.1 배정 안 (검토 전)
@@ -200,7 +200,7 @@ configs/data/
 생성 명령은 다음과 같다.
 
 ```bash
-docker compose run --rm lab python -m data.build_coco [name=N fraction=F overwrite=true]
+docker compose run --rm lab python scripts/build_coco.py [name=N fraction=F overwrite=true]
 ```
 
 - `name` 기본값은 `aihub101-ped-v1`이다.
