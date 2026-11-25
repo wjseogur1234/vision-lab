@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/app
       - ${RAW_DATA_DIR:?.env 파일에 RAW_DATA_DIR을 적는다}:${RAW_DATA_DIR}:ro
-    shm_size: "8gb"
+    ipc: host
     stdin_open: true
     tty: true
     deploy:
