@@ -8,9 +8,9 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
 
 WORKDIR /app
 
-# opencv-python(LibreYOLO 의존성)이 쓰는 시스템 라이브러리
+# libgl1, libglib2.0-0: opencv-python(LibreYOLO 의존성)용. git: 학습 run에 코드 출처를 남긴다
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 git \
     && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml uv.lock ./
