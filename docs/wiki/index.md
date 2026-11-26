@@ -23,6 +23,9 @@
 - [adr-0002-scripts-by-output-stage](../adr/adr-0002-scripts-by-output-stage.md) — 실행 스크립트 산출물 단계 분리, Hydra는 scripts만 (승인)
 
 ## Phase 1 — 학습
+### 설계
+- [training-architecture](phase_1/analyses/training-architecture.md) — 학습 구조 설계안. 요구사항, 모듈, 호출 관계, 설정, LibreYOLO 연동 지점 (제안)
+
 ### 객체 검출
 - [libreyolo-models](phase_1/analyses/libreyolo-models.md) — 보행자 검출 후보, 설치 조건, 실행 환경, 검증 범위
 

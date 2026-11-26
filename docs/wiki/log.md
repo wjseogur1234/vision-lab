@@ -2,6 +2,10 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-26] query | Phase 1 학습 구조 설계
+- 생성: [training-architecture](phase_1/analyses/training-architecture.md)
+- 갱신: [index](index.md) (Phase 1 > 설계)
+
 ## [2026-11-26] schema | 결정 기록(ADR) 도입
 - 근거: 이웃 프로젝트(project-HNU-2026_residual-pedestrian)의 ADR 규칙과 템플릿을 옮겼다.
 - 생성: `docs/adr/`, `wiki/.templates/adr-template.md`, [adr-0001-coco-json-labels](../adr/adr-0001-coco-json-labels.md), [adr-0002-scripts-by-output-stage](../adr/adr-0002-scripts-by-output-stage.md)
