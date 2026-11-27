@@ -28,3 +28,7 @@ outputs/*
 
 .vscode/
 .claude/
+
+# MLflow 기본 저장 위치. tracking URI 없이 실행하면 루트에 생긴다.
+mlruns/
+mlflow.db
