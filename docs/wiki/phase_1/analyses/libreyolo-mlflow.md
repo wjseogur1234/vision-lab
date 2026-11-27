@@ -3,7 +3,7 @@ type: analysis
 tags: [libreyolo, mlflow, experiment-tracking]
 sources: ["wiki/phase_1/sources/libreyolo-model-reference.md"]
 created: 2026-11-24
-updated: 2026-11-24
+updated: 2026-11-27
 ---
 
 # LibreYOLO MLflow 연동
@@ -87,8 +87,8 @@ model.train(
 
 ## 6. 정해야 할 것
 
-- [ ] tracking 저장소: 로컬 파일, SQLite, 별도 서버.
-- [ ] artifact 위치. 현재 학습 결과는 임시로 `outputs/runs/`에 있다.
+- [x] tracking 저장소: compose `mlflow` 서비스 + SQLite. ([training-architecture 10.2절](training-architecture.md#102-mlflow-서버-구성))
+- [x] artifact 위치: `outputs/mlflow/artifacts/`.
 - [ ] experiment와 run 이름 규칙.
 - [ ] tag 목록. 예: `phase`, `purpose`(smoke, baseline, ablation).
 - [ ] `smoke-mini` 결과를 MLflow에 다시 올릴지.

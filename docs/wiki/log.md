@@ -2,6 +2,10 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-27] query | MLflow 시험 결과 반영
+- 근거: mini 1 epoch 시험(2026-11-26). 문제 5개와 해결 방법.
+- 갱신: [training-architecture](phase_1/analyses/training-architecture.md) (1.2절 N7·N8, 3~5절, 7절, 9절, 10.1절·10.2절 신설, 12절), [libreyolo-mlflow](phase_1/analyses/libreyolo-mlflow.md) (6절 저장소·artifact 결정)
+
 ## [2026-11-26] query | Phase 1 학습 구조 설계
 - 생성: [training-architecture](phase_1/analyses/training-architecture.md)
 - 갱신: [index](index.md) (Phase 1 > 설계)
