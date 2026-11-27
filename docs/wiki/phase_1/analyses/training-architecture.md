@@ -107,7 +107,7 @@ compose.yaml               # + mlflow 서비스
 |---|---|---|
 | `scripts/train.py` | Hydra 설정 읽기, 값 풀기, worker 시작 방식 지정, 함수 순서대로 호출, 종료 코드 | 계산, 파일 쓰기 |
 | `training.checks` | 데이터셋 YAML과 COCO JSON 존재 확인. `data/raw/` 항목이 링크인지 확인 | 이미지 열기 |
-| `training.provenance` | `metadata.yaml` 읽기, 분할 파일 해시, `git` 명령으로 커밋과 수정 여부 | MLflow 호출 |
+| `training.provenance` | `metadata.yaml` 읽기, 분할 파일 해시, `git` 명령으로 커밋, 브랜치, 수정 여부 | MLflow 호출 |
 | `training.tracking` | `MLflowLogger` 상속. run을 연 직후 tag를 붙이고, 끝날 때 `metrics.jsonl`과 `best.pt`를 올린다 | 학습 실행 |
 | `training.runner` | 가중치 경로로 모델 생성, `train()` 호출, 결과 dict 반환. run 이름 충돌 처리 | 설정 해석 |
 
@@ -151,6 +151,7 @@ sequenceDiagram
     CK-->>S: dataset_dir
     S->>P: collect(dataset_dir, repo_dir)
     P-->>S: tags (dict)
+    S->>S: tags에 model, purpose 추가
     S->>R: free_run_name(project, name)
     R-->>S: name
     S->>T: make_loggers(tracking, experiment, name, tags)
@@ -251,7 +252,7 @@ weights: weights/LibreYOLOXs.pt   # Python API는 모델 ID를 받지 않는다
 # tracking/mlflow.yaml
 kind: mlflow
 uri: http://mlflow:5000           # compose 서비스 이름
-experiment: aihub101-ped
+experiment: ped/aihub101/phase1   # 과제/데이터셋/단계. 10.3절
 log_checkpoints: true
 ```
 
@@ -300,6 +301,28 @@ log_checkpoints: true
 
 > [!note] LibreYOLO 버전을 올릴 때
 > 1번, 2번, 3번을 다시 확인한다. 고쳐졌으면 우회 코드를 지운다.
+
+### 10.3 experiment 이름과 tag
+
+근거: MLflow 공식 문서와 Databricks 문서, 실험 관리 가이드 (2026-11-27 조사).
+
+- MLflow experiment에는 폴더 계층이 없다. 계층은 이름으로 만든다.
+- 형식은 `<과제>/<데이터셋>/<단계>`다. 예: `ped/aihub101/phase1`.
+- 데이터셋 버전은 experiment 이름에 넣지 않는다. tag로 구분한다.
+- run은 폴더로 나누지 않는다. tag로 걸러서 본다. 예: `tags.model = "yolox-s"`.
+
+| tag | 값 예 | 만드는 곳 |
+|---|---|---|
+| `git_commit` | `02e919e` | `provenance` |
+| `git_branch` | `refactor/hydra-config` | `provenance` |
+| `git_dirty` | `true`, `false` | `provenance` |
+| `dataset` | `aihub101-ped-v2` | `provenance` (`metadata.yaml`) |
+| `split_hash` | 분할 파일 해시 | `provenance` |
+| `model` | `yolox-s` | `scripts/train.py` (`model.id`) |
+| `purpose` | `smoke`, `baseline`, `ablation` | `scripts/train.py` (`experiment` 그룹) |
+
+- `provenance`는 데이터와 코드 출처만 만든다. `model`과 `purpose`는 설정에서 온다.
+- `scripts/train.py`가 두 dict를 합쳐 `make_loggers`에 넘긴다.
 
 ### 10.2 MLflow 서버 구성
 
@@ -367,6 +390,8 @@ flowchart TB
 
 - [x] MLflow 저장소: compose `mlflow` 서비스 + SQLite. artifact는 `outputs/mlflow/artifacts/` (2026-11-26).
 - [x] 컨테이너 git: 설치한다 (2026-11-26, 커밋 `0a8a18b`).
+- [x] experiment 이름: `ped/aihub101/phase1` 형식 (2026-11-27, 10.3절).
+- [x] tag 목록: `git_branch`, `model` 추가 (2026-11-27, 10.3절).
 - [ ] run 이름 규칙. 안: `<모델>_<데이터셋>`, 겹치면 `-vN`.
 - [ ] 첫 기준 모델. 안: `yolox-s` (학습 확인됨).
 - [ ] `configs/prep/common.yaml`을 공유할지.

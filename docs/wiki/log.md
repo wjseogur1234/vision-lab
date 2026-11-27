@@ -2,6 +2,11 @@
 
 최신 기록부터 표시한다. 규칙은 `docs/AGENTS.md`의 "index.md / log.md".
 
+## [2026-11-27] query | MLflow experiment 이름과 tag
+- 근거: MLflow 공식 문서, Databricks 문서, 실험 관리 가이드.
+- 결정: experiment 이름 `<과제>/<데이터셋>/<단계>`. tag에 `git_branch`, `model` 추가.
+- 갱신: [training-architecture](phase_1/analyses/training-architecture.md) (5절, 7절, 9절, 10.3절 신설, 12절), [libreyolo-mlflow](phase_1/analyses/libreyolo-mlflow.md) (6절)
+
 ## [2026-11-27] query | MLflow 시험 결과 반영
 - 근거: mini 1 epoch 시험(2026-11-26). 문제 5개와 해결 방법.
 - 갱신: [training-architecture](phase_1/analyses/training-architecture.md) (1.2절 N7·N8, 3~5절, 7절, 9절, 10.1절·10.2절 신설, 12절), [libreyolo-mlflow](phase_1/analyses/libreyolo-mlflow.md) (6절 저장소·artifact 결정)

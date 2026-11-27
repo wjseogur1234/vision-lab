@@ -89,8 +89,9 @@ model.train(
 
 - [x] tracking 저장소: compose `mlflow` 서비스 + SQLite. ([training-architecture 10.2절](training-architecture.md#102-mlflow-서버-구성))
 - [x] artifact 위치: `outputs/mlflow/artifacts/`.
-- [ ] experiment와 run 이름 규칙.
-- [ ] tag 목록. 예: `phase`, `purpose`(smoke, baseline, ablation).
+- [x] experiment 이름: `<과제>/<데이터셋>/<단계>`. ([training-architecture 10.3절](training-architecture.md#103-experiment-이름과-tag))
+- [x] tag 목록: training-architecture 10.3절.
+- [ ] run 이름 규칙.
 - [ ] `smoke-mini` 결과를 MLflow에 다시 올릴지.
 
 규격이 정해지면 `requirements/`에 기록 규격 페이지를 만든다. 이 페이지가 그 근거가 된다.
